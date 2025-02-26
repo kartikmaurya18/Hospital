@@ -2,25 +2,37 @@ package com.hospital.controller;
 
 import com.hospital.entity.Doctor;
 import com.hospital.service.DoctorService;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/doctors")
 public class DoctorController {
 
+    @Autowired
     private final DoctorService doctorService;
 
     public DoctorController(DoctorService doctorService) {
         this.doctorService = doctorService;
     }
 
-    @GetMapping
-    public List<Doctor> getAllDoctors() {
-        return doctorService.getAllDoctors();
+    @GetMapping("/getAll")
+    public ResponseEntity<?> getAllDoctors() {
+        try {
+            List<Doctor> doctorrr= doctorService.getAllDoctors();
+            return new ResponseEntity<>(doctorrr,HttpStatus.OK);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(Map.of("error",e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        
     }
 
     @GetMapping("/{id}")
@@ -29,9 +41,15 @@ public class DoctorController {
         return doctor.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping
-    public Doctor addDoctor(@RequestBody Doctor doctor) {
-        return doctorService.addDoctor(doctor);
+    @PostMapping("/register")
+    public ResponseEntity<?> addDoctor(@RequestBody Doctor doctor) {
+        try {
+            doctorService.addDoctor(doctor);
+            return new ResponseEntity<>("created", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(Map.of("error",e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        
     }
 
     @DeleteMapping("/{id}")

@@ -2,13 +2,15 @@ package com.hospital.service;
 
 import com.hospital.entity.Doctor;
 import com.hospital.repository.DoctorRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class DoctorService {
-
+    @Autowired
     private final DoctorRepository doctorRepository;
 
     public DoctorService(DoctorRepository doctorRepository) {

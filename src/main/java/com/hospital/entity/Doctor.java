@@ -1,5 +1,7 @@
 package com.hospital.entity;
 
+import com.hospital.enums.Role;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -22,15 +24,22 @@ public class Doctor {
     @Column(nullable = false)
     private String phoneNumber;
 
-    // Constructor
-    public Doctor() {}
+    @Column(nullable=false)
+    private String password;
 
-    public Doctor(Long id, String name, String specialty, String email, String phoneNumber) {
-        this.id = id;
-        this.name = name;
-        this.specialty = specialty;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+   
+
+    
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     // Getter and Setter Methods
@@ -73,4 +82,13 @@ public class Doctor {
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+  
 }

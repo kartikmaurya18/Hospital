@@ -3,6 +3,8 @@ package com.hospital.entity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+import com.hospital.enums.AppointmentStatus;
+
 @Entity
 @Table(name = "appointments")
 public class Appointment {

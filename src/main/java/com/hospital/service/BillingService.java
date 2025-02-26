@@ -26,4 +26,13 @@ public class BillingService {
     public Billing getBillingById(Long id) {
         return billingRepository.findById(id).orElse(null);
     }
+
+    public boolean deleteBilling(Long id) {
+        if (billingRepository.existsById(id)) {
+            billingRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
+    
 }

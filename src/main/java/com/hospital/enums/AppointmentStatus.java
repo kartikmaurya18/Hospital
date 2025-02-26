@@ -1,7 +1,8 @@
-package com.hospital.entity;
+package com.hospital.enums;
 
 public enum AppointmentStatus {
     PENDING,
     CONFIRMED,
-    CANCELLED
+    CANCELLED,
+    SCHEDULED
 }
