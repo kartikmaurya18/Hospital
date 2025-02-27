@@ -1,37 +1,44 @@
 package com.hospital.config;
 
-import java.util.Collection;
-import java.util.Collections;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
 
-import com.hospital.entity.Doctor;
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable()) // Disabling CSRF for development (not recommended for production)
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/admin/**").hasRole("ADMIN") // Only ADMIN can access this
+                .requestMatchers("/api/doctor/**").hasRole("DOCTOR") // Only DOCTOR can access this
+                .requestMatchers("/api/patient/**").hasRole("PATIENT") // Only PATIENT can access this
+                .requestMatchers("/api/public/**").permitAll() // Public API accessible to everyone
+                .anyRequest().authenticated() // All other requests need authentication
+            )
+            .formLogin(form -> form
+                .loginPage("/login") // Custom login page
+                .defaultSuccessUrl("/dashboard", true) // Redirect after successful login
+                .permitAll()
+            )
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login?logout")
+                .permitAll()
+            );
 
-public class SecurityConfig implements UserDetails{
-@Autowired
-    Doctor doctor;
-
-    public SecurityConfig(Doctor doctor){
-        this.doctor=doctor;
+        return http.build();
     }
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        
-        return Collections.singleton(new SimpleGrantedAuthority("ROLE_"+doctor.getRole().name()));
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
-
-    @Override
-    public String getPassword() {
-        return doctor.getPassword();
-    }
-
-    @Override
-    public String getUsername() {
-        return doctor.getEmail();
-    }
-    
 }
