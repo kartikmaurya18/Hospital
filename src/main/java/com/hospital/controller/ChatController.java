@@ -1,34 +1,44 @@
 package com.hospital.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.hospital.dto.ChatMessageRequest;
 import com.hospital.entity.ChatMessage;
 import com.hospital.service.ChatService;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/api/chat")
 public class ChatController {
 
+    private static final Logger LOGGER = Logger.getLogger(ChatController.class.getName());
+
     @Autowired
     private ChatService chatService;
 
     @PostMapping("/send")
-    public ChatMessage sendMessage(@RequestParam Long senderId,
-                                   @RequestParam Long receiverId,
-                                   @RequestParam String message) {
+    public ResponseEntity<?> sendMessage(@RequestBody ChatMessageRequest requestDTO) {
         try {
-            return chatService.sendMessage(senderId, receiverId, message);
+            ChatMessage chatMessage = chatService.sendMessage(
+                requestDTO.getSenderId(),
+                requestDTO.getReceiverId(),
+                requestDTO.getMessage()
+            );
+            return ResponseEntity.ok(chatMessage);
         } catch (Exception e) {
-            e.printStackTrace(); // Log the error properly
-            throw new RuntimeException("Error sending message");
+            LOGGER.log(Level.SEVERE, "Error sending message", e);
+            return ResponseEntity.internalServerError().body("Error sending message: " + e.getMessage());
         }
     }
 
     @GetMapping("/history")
-    public List<ChatMessage> getChatHistory(@RequestParam Long userId1, @RequestParam Long userId2) {
-        return chatService.getChatHistory(userId1, userId2);
+    public ResponseEntity<?> getChatHistory(@RequestParam Long userId1, @RequestParam Long userId2) {
+        List<ChatMessage> chatHistory = chatService.getChatHistory(userId1, userId2);
+        return ResponseEntity.ok(chatHistory);
     }
 }

@@ -51,4 +51,8 @@ public class Patient {
 
     public String getMedicalHistory() { return medicalHistory; }
     public void setMedicalHistory(String medicalHistory) { this.medicalHistory = medicalHistory; }
+
+    public Object getPassword() {
+        throw new UnsupportedOperationException("Unimplemented method 'getPassword'");
+    }
 }

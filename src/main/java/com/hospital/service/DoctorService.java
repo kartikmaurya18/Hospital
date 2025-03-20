@@ -32,4 +32,8 @@ public class DoctorService {
     public void deleteDoctor(Long id) {
         doctorRepository.deleteById(id);
     }
+
+    public Doctor findByUsername(String username) {
+        throw new UnsupportedOperationException("Unimplemented method 'findByUsername'");
+    }
 }

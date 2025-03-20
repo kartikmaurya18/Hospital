@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Chat</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+    <h2>WebSocket Chat</h2>
+    <div>
+        <input type="text" id="sender" placeholder="Your Name">
+        <input type="text" id="receiver" placeholder="Receiver Name">
+        <input type="text" id="message" placeholder="Type a message">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+    <div id="chat-box"></div>
+
+    <script>
+        var socket = new SockJS('/ws');
+        var stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function (frame) {
+            console.log('Connected: ' + frame);
+            stompClient.subscribe('/topic/messages', function (message) {
+                var msg = JSON.parse(message.body);
+                var chatBox = document.getElementById("chat-box");
+                chatBox.innerHTML += `<p><strong>${msg.sender}:</strong> ${msg.content}</p>`;
+            });
+        });
+
+        function sendMessage() {
+            var sender = document.getElementById("sender").value;
+            var receiver = document.getElementById("receiver").value;
+            var message = document.getElementById("message").value;
+
+            stompClient.send("/app/chat", {}, JSON.stringify({
+                sender: sender,
+                receiver: receiver,
+                content: message,
+                timestamp: new Date().toISOString()
+            }));
+        }
+    </script>
+</body>
+</html>
