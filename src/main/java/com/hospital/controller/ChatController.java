@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.hospital.dto.ChatMessageRequest;
+import com.hospital.dto.ChatRequest;
 import com.hospital.entity.ChatMessage;
 import com.hospital.service.ChatService;
 
@@ -22,12 +22,12 @@ public class ChatController {
     private ChatService chatService;
 
     @PostMapping("/send")
-    public ResponseEntity<?> sendMessage(@RequestBody ChatMessageRequest requestDTO) {
+    public ResponseEntity<?> sendMessage(@RequestBody ChatRequest requestDTO) {
         try {
             ChatMessage chatMessage = chatService.sendMessage(
                 requestDTO.getSenderId(),
-                requestDTO.getReceiverId(),
-                requestDTO.getMessage()
+                requestDTO.getSenderId(),
+                requestDTO.getMessages()
             );
             return ResponseEntity.ok(chatMessage);
         } catch (Exception e) {
