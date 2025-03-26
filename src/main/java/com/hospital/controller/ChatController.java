@@ -24,11 +24,20 @@ public class ChatController {
     @PostMapping("/send")
     public ResponseEntity<?> sendMessage(@RequestBody ChatRequest requestDTO) {
         try {
+            // ✅ Ensure ChatRequest contains senderId and receiverId
+            if (requestDTO.getSenderId() == null || requestDTO.getReceiverId() == null) {
+                return ResponseEntity.badRequest().body("Sender ID and Receiver ID are required");
+            }
+
+            // ✅ Convert Message List to Single Message (if needed)
+            String messageContent = requestDTO.getMessages().get(0).getContent();
+
             ChatMessage chatMessage = chatService.sendMessage(
                 requestDTO.getSenderId(),
-                requestDTO.getSenderId(),
-                requestDTO.getMessages()
+                requestDTO.getReceiverId(),
+                messageContent
             );
+
             return ResponseEntity.ok(chatMessage);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error sending message", e);

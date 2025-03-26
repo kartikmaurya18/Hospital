@@ -1,6 +1,7 @@
 package com.hospital.controller;
 
-import com.hospital.service.ChatbotService;
+import com.hospital.dto.ChatRequest;
+import com.hospital.service.OpenAIService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,10 +10,15 @@ import org.springframework.web.bind.annotation.*;
 public class ChatbotController {
 
     @Autowired
-    private ChatbotService chatbotService;
+    private OpenAIService openAIService;
 
-    @GetMapping("/ask")
-    public String askQuestion(@RequestParam String question) {
-        return chatbotService.getResponse(question);
+    @PostMapping("/ask")
+    public String askChatbot(@RequestBody ChatRequest request) {
+        if (request.getMessages() == null || request.getMessages().isEmpty()) {
+            return "Message cannot be empty.";
+        }
+
+        // Send user message to OpenAI and get response
+        return openAIService.getChatbotResponse(request.getMessages().get(0).getContent());
     }
 }

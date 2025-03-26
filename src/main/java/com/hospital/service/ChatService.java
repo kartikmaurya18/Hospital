@@ -3,7 +3,6 @@ package com.hospital.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.hospital.dto.ChatRequest.Message;
 import com.hospital.entity.ChatMessage;
 import com.hospital.repository.ChatMessageRepository;
 
@@ -15,7 +14,7 @@ public class ChatService {
     @Autowired
     private ChatMessageRepository chatMessageRepository;
 
-    public ChatMessage sendMessage(Long senderId, Long receiverId, List<Message> message) {
+    public ChatMessage sendMessage(Long senderId, Long receiverId, String messageContent) {
         ChatMessage chatMessage = new ChatMessage();
         return chatMessageRepository.save(chatMessage);
     }
