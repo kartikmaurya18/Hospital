@@ -2,6 +2,7 @@ package com.hospital.service;
 
 import com.hospital.dto.ChatRequest;
 import com.hospital.dto.ChatResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -10,13 +11,12 @@ import java.util.Collections;
 @Service
 public class OpenAIService {
 
-    private static final String OPENAI_API_KEY = null;
-    
-    private final WebClient webClient;
-    
-        String apiKey = "Bearer " + OPENAI_API_KEY;
+    @Value("${openai.api.key}") // Load API key from application.properties
+    private String openAiApiKey;
 
-    public OpenAIService(WebClient.Builder webClientBuilder) {
+    private final WebClient webClient;
+
+    public OpenAIService(WebClient.Builder webClientBuilder, @Value("${openai.api.key}") String apiKey) {
         this.webClient = webClientBuilder
                 .baseUrl("https://api.openai.com/v1/chat/completions")
                 .defaultHeader("Content-Type", "application/json")
@@ -25,7 +25,6 @@ public class OpenAIService {
     }
 
     public String getChatbotResponse(String userMessage) {
-        // Creating a ChatRequest object
         ChatRequest request = new ChatRequest(
                 "gpt-3.5-turbo",
                 Collections.singletonList(new ChatRequest.Message("user", userMessage)), null, null
@@ -36,9 +35,8 @@ public class OpenAIService {
                 .retrieve()
                 .bodyToMono(ChatResponse.class);
 
-        // Extracting the AI response
         return responseMono.map(response -> 
                 response.getChoices().get(0).getMessage().getContent()
-        ).block(); // Blocking to get response synchronously
+        ).block();
     }
 }
