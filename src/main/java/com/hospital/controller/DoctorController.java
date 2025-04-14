@@ -41,7 +41,14 @@ public class DoctorController {
         return doctor.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-
+    @PostMapping("/register")
+    public ResponseEntity<?> addDoctor(@RequestBody Doctor doctor) {
+        try {
+            doctorService.addDoctor(doctor);
+            return new ResponseEntity<>("created", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(Map.of("error",e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         
     }
 
