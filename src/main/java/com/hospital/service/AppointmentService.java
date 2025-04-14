@@ -6,10 +6,9 @@ import com.hospital.entity.Patient;
 import com.hospital.repository.AppointmentRepository;
 import com.hospital.repository.DoctorRepository;
 import com.hospital.repository.PatientRepository;
-
 import org.springframework.stereotype.Service;
-
 import java.util.List;
+
 import java.util.Optional;
 
 @Service
@@ -27,7 +26,6 @@ public class AppointmentService {
         this.patientRepository = patientRepository;
     }
 
-
     public Appointment createAppointment(Long doctorId, Long patientId, Appointment appointment) {
     try {
         Doctor doctor = doctorRepository.findById(doctorId)
@@ -43,8 +41,6 @@ public class AppointmentService {
         throw new RuntimeException("Error creating appointment: " + e.getMessage());
     }
 }
-
-
     public List<Appointment> getAllAppointments() {
         return appointmentRepository.findAll();
     }
@@ -57,3 +53,4 @@ public class AppointmentService {
         appointmentRepository.deleteById(id);
     }
 }
+
