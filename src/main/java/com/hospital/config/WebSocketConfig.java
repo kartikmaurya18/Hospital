@@ -17,9 +17,3 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .withSockJS();          // Enables SockJS fallback for unsupported browsers
     }
 
-    @Override
-    public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/topic");  // Enables a simple in-memory message broker
-        registry.setApplicationDestinationPrefixes("/app"); // Prefix for message mapping
-    }
-}
