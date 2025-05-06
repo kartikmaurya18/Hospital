@@ -35,7 +35,6 @@ public class Appointment {
         this.patient = patient;
         this.appointmentDateTime = appointmentDateTime;
         this.status = status;
-    }
 
     // Getters and Setters
     public Long getId() { return id; }
