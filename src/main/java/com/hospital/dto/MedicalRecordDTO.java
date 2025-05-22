@@ -11,7 +11,6 @@ public class MedicalRecordDTO {
     private String prescription;
     private LocalDate recordDate;
 
-    // Getters and Setters
     public Long getPatientId() {
         return patientId;
     }
