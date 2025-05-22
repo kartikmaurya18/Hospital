@@ -37,6 +37,7 @@ public class InventoryController {
         return ResponseEntity.ok(newItem);
     }
 
+    // Update an inventory item
     @PutMapping("/{id}")
     public ResponseEntity<InventoryItem> updateItem(@PathVariable Long id, @RequestBody InventoryItem item) {
         InventoryItem updatedItem = inventoryService.updateItem(id, item);
