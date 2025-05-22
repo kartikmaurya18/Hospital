@@ -18,7 +18,7 @@ public class ChatbotController {
             return "Message cannot be empty.";
         }
 
-        // Send user message to OpenAI and get response
+       
         return openAIService.getChatbotResponse(request.getMessages().get(0).getContent());
     }
 }
