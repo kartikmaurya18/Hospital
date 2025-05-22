@@ -21,7 +21,7 @@ public class ChatResponse {
         private Message message;
 
         public Choice() {
-        } // Default constructor for Jackson
+        } 
 
         public Choice(int index, Message message) {
             this.index = index;
