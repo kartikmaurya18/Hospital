@@ -6,8 +6,7 @@ public class ChatResponse {
     private List<Choice> choices;
 
     public ChatResponse() {
-    } // Default constructor for Jackson
-
+    } 
     public List<Choice> getChoices() {
         return choices;
     }
