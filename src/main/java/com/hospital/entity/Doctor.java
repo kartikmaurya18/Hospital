@@ -30,10 +30,6 @@ public class Doctor {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-   
-
-    
-
     public Role getRole() {
         return role;
     }
