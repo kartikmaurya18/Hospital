@@ -9,10 +9,8 @@ import java.util.List;
 
 @Repository
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
-    
-    // Fetch all messages between two users (doctor and patient)
-    List<ChatMessage> findBySenderIdAndReceiverIdOrReceiverIdAndSenderId(
-            Long senderId, Long receiverId, Long receiverId2, Long senderId2);
 
-    List<ChatMessage> findBySenderIdAndReceiverIdOrderByTimestampAsc(Long senderId, Long receiverId);
+    // Fetch all messages between two users (doctor and patient)
+    List<ChatMessage> findBySenderIdAndReceiverIdOrReceiverIdAndSenderIdOrderByTimestampAsc(
+            Long senderId1, Long receiverId1, Long senderId2, Long receiverId2);
 }

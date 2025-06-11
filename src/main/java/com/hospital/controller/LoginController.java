@@ -14,6 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin(origins = "http://localhost:3000")
 public class LoginController {
 
     @Autowired
@@ -31,7 +32,7 @@ public class LoginController {
         String password = credentials.get("password");
 
         if (email == null || password == null) {
-            return ResponseEntity.badRequest().body("Email and password are required");
+            return ResponseEntity.badRequest().body(Map.of("message", "Email and password are required"));
         }
 
         // Check in Doctor table
@@ -54,7 +55,7 @@ public class LoginController {
             return ResponseEntity.ok(response);
         }
 
-        return ResponseEntity.badRequest().body("Invalid credentials");
+        return ResponseEntity.badRequest().body(Map.of("message", "Invalid credentials"));
     }
 
     @GetMapping("/verify")
@@ -62,6 +63,6 @@ public class LoginController {
         if (token != null && token.startsWith("Bearer ")) {
             return ResponseEntity.ok().build();
         }
-        return ResponseEntity.badRequest().body("Invalid token");
+        return ResponseEntity.badRequest().body(Map.of("message", "Invalid token"));
     }
 }

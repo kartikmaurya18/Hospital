@@ -96,10 +96,10 @@ CREATE TABLE chat_messages (
 -- Password for all users is 'password123'
 INSERT INTO doctors (name, specialty, email, phone_number, password, role)
 VALUES 
-('Admin User', 'General Medicine', 'admin@hospital.com', '1234567890', '$2a$10$rDkPvvAFV6GgJjXpYWYw8OQZJzX5X5X5X5X5X5X5X5X5X5X5X5X5', 'ADMIN'),
-('Dr. John Smith', 'Cardiology', 'john.smith@hospital.com', '2345678901', '$2a$10$rDkPvvAFV6GgJjXpYWYw8OQZJzX5X5X5X5X5X5X5X5X5X5X5X5X5', 'DOCTOR'),
-('Dr. Sarah Johnson', 'Pediatrics', 'sarah.johnson@hospital.com', '3456789012', '$2a$10$rDkPvvAFV6GgJjXpYWYw8OQZJzX5X5X5X5X5X5X5X5X5X5X5X5X5', 'DOCTOR');
+('Admin User', 'General Medicine', 'admin@hospital.com', '1234567890', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', 'ADMIN'),
+('Dr. John Smith', 'Cardiology', 'john.smith@hospital.com', '2345678901', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', 'DOCTOR'),
+('Dr. Sarah Johnson', 'Pediatrics', 'sarah.johnson@hospital.com', '3456789012', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', 'DOCTOR');
 
 INSERT INTO patients (name, email, password, phone_number, date_of_birth, medical_history, role)
 VALUES 
-('Test Patient', 'patient@test.com', '$2a$10$rDkPvvAFV6GgJjXpYWYw8OQZJzX5X5X5X5X5X5X5X5X5X5X5X5X5', '9876543210', '1990-01-01', 'No significant medical history', 'PATIENT'); 
+('Test Patient', 'patient@test.com', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', '9876543210', '1990-01-01', 'No significant medical history', 'PATIENT'); 
