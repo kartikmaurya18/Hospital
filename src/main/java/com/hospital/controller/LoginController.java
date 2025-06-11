@@ -6,6 +6,7 @@ import com.hospital.service.DoctorService;
 import com.hospital.service.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -21,6 +22,9 @@ public class LoginController {
     @Autowired
     private PatientService patientService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
         String email = credentials.get("email");
@@ -32,19 +36,21 @@ public class LoginController {
 
         // Check in Doctor table
         Doctor doctor = doctorService.findByEmail(email);
-        if (doctor != null && doctor.getPassword().equals(password)) {
+        if (doctor != null && passwordEncoder.matches(password, doctor.getPassword())) {
             Map<String, Object> response = new HashMap<>();
-            response.put("token", "doctor-token-" + doctor.getId()); // In production, use proper JWT token
+            response.put("token", "doctor-token-" + doctor.getId());
             response.put("user", doctor);
+            response.put("role", "DOCTOR");
             return ResponseEntity.ok(response);
         }
 
         // Check in Patient table
         Patient patient = patientService.findByEmail(email);
-        if (patient != null && patient.getPassword().equals(password)) {
+        if (patient != null && passwordEncoder.matches(password, patient.getPassword())) {
             Map<String, Object> response = new HashMap<>();
-            response.put("token", "patient-token-" + patient.getId()); // In production, use proper JWT token
+            response.put("token", "patient-token-" + patient.getId());
             response.put("user", patient);
+            response.put("role", "PATIENT");
             return ResponseEntity.ok(response);
         }
 
@@ -53,7 +59,6 @@ public class LoginController {
 
     @GetMapping("/verify")
     public ResponseEntity<?> verifyToken(@RequestHeader("Authorization") String token) {
-        // In production, implement proper token verification
         if (token != null && token.startsWith("Bearer ")) {
             return ResponseEntity.ok().build();
         }

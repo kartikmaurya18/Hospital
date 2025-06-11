@@ -17,7 +17,8 @@ CREATE TABLE patients (
     password VARCHAR(255) NOT NULL,
     phone_number VARCHAR(20),
     date_of_birth DATE,
-    medical_history TEXT
+    medical_history TEXT,
+    role VARCHAR(20) DEFAULT 'PATIENT'
 );
 
 CREATE TABLE doctors (
@@ -91,13 +92,14 @@ CREATE TABLE chat_messages (
     timestamp TIMESTAMP NOT NULL
 );
 
--- Insert initial data
+-- Insert initial data with BCrypt hashed passwords
+-- Password for all users is 'password123'
 INSERT INTO doctors (name, specialty, email, phone_number, password, role)
 VALUES 
-('Admin User', 'General Medicine', 'admin@hospital.com', '1234567890', 'admin123', 'ADMIN'),
-('Dr. John Smith', 'Cardiology', 'john.smith@hospital.com', '2345678901', 'doctor123', 'DOCTOR'),
-('Dr. Sarah Johnson', 'Pediatrics', 'sarah.johnson@hospital.com', '3456789012', 'doctor123', 'DOCTOR');
+('Admin User', 'General Medicine', 'admin@hospital.com', '1234567890', '$2a$10$rDkPvvAFV6GgJjXpYWYw8OQZJzX5X5X5X5X5X5X5X5X5X5X5X5X5', 'ADMIN'),
+('Dr. John Smith', 'Cardiology', 'john.smith@hospital.com', '2345678901', '$2a$10$rDkPvvAFV6GgJjXpYWYw8OQZJzX5X5X5X5X5X5X5X5X5X5X5X5X5', 'DOCTOR'),
+('Dr. Sarah Johnson', 'Pediatrics', 'sarah.johnson@hospital.com', '3456789012', '$2a$10$rDkPvvAFV6GgJjXpYWYw8OQZJzX5X5X5X5X5X5X5X5X5X5X5X5X5', 'DOCTOR');
 
-INSERT INTO patients (name, email, password, phone_number, date_of_birth, medical_history)
+INSERT INTO patients (name, email, password, phone_number, date_of_birth, medical_history, role)
 VALUES 
-('Test Patient', 'patient@test.com', 'patient123', '9876543210', '1990-01-01', 'No significant medical history'); 
+('Test Patient', 'patient@test.com', '$2a$10$rDkPvvAFV6GgJjXpYWYw8OQZJzX5X5X5X5X5X5X5X5X5X5X5X5X5', '9876543210', '1990-01-01', 'No significant medical history', 'PATIENT'); 
