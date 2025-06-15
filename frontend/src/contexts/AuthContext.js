@@ -20,13 +20,40 @@ export const AuthProvider = ({ children }) => {
   const { showNotification } = useNotification();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
-    if (token && userData) {
-      setUser(JSON.parse(userData));
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    }
-    setLoading(false);
+    const initializeAuth = () => {
+      try {
+        const token = localStorage.getItem('token');
+        const userData = localStorage.getItem('user');
+
+        if (token && userData) {
+          try {
+            const parsedUserData = JSON.parse(userData);
+            if (parsedUserData && typeof parsedUserData === 'object') {
+              setUser(parsedUserData);
+              api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            } else {
+              // Invalid user data format
+              localStorage.removeItem('token');
+              localStorage.removeItem('user');
+            }
+          } catch (parseError) {
+            console.error('Error parsing user data:', parseError);
+            // Clear invalid data
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+          }
+        }
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        // Clear any potentially corrupted data
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeAuth();
   }, []);
 
   const login = async (email, password) => {
@@ -34,6 +61,11 @@ export const AuthProvider = ({ children }) => {
       const response = await api.post('/auth/login', { email, password });
       const { token, user: userData } = response.data;
       
+      if (!token || !userData) {
+        throw new Error('Invalid response from server');
+      }
+
+      // Store auth data
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(userData));
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -42,35 +74,49 @@ export const AuthProvider = ({ children }) => {
       showNotification('Login successful', 'success');
       
       // Redirect based on user role
-      if (userData.role === 'ADMIN') {
-        navigate('/admin/dashboard');
-      } else if (userData.role === 'DOCTOR') {
-        navigate('/doctor/dashboard');
+      const role = userData.role?.toLowerCase();
+      if (role) {
+        navigate(`/${role}/dashboard`);
       } else {
-        navigate('/patient/dashboard');
+        throw new Error('Invalid user role');
       }
     } catch (error) {
-      showNotification(error.response?.data?.message || 'Login failed', 'error');
+      const errorMessage = error.response?.data?.message || error.message || 'Login failed';
+      showNotification(errorMessage, 'error');
       throw error;
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    delete api.defaults.headers.common['Authorization'];
-    setUser(null);
-    navigate('/login');
-    showNotification('Logged out successfully', 'success');
+    try {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      delete api.defaults.headers.common['Authorization'];
+      setUser(null);
+      navigate('/login');
+      showNotification('Logged out successfully', 'success');
+    } catch (error) {
+      console.error('Error during logout:', error);
+      showNotification('Error during logout', 'error');
+    }
   };
 
   const register = async (userData) => {
     try {
+      if (!userData || typeof userData !== 'object') {
+        throw new Error('Invalid registration data');
+      }
+
       const response = await api.post('/auth/register', userData);
+      if (!response.data) {
+        throw new Error('Invalid response from server');
+      }
+
       showNotification('Registration successful', 'success');
       return response.data;
     } catch (error) {
-      showNotification(error.response?.data?.message || 'Registration failed', 'error');
+      const errorMessage = error.response?.data?.message || error.message || 'Registration failed';
+      showNotification(errorMessage, 'error');
       throw error;
     }
   };

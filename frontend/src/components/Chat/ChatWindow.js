@@ -19,6 +19,8 @@ const ChatWindow = ({ receiverId, receiverName, receiverRole }) => {
     const { user } = useAuth();
 
     const connectWebSocket = useCallback(() => {
+        if (!user?.id) return; // Don't connect if user is not available
+
         const socket = new SockJS('http://localhost:8080/api/ws');
         const client = new Client({
             webSocketFactory: () => socket,
@@ -30,14 +32,28 @@ const ChatWindow = ({ receiverId, receiverName, receiverRole }) => {
                 
                 // Subscribe to user's topic
                 client.subscribe(`/topic/user.${user.id}`, (message) => {
-                    const newMessage = JSON.parse(message.body);
-                    setMessages((prevMessages) => [...prevMessages, newMessage]);
+                    try {
+                        if (message.body) {
+                            const newMessage = JSON.parse(message.body);
+                            setMessages((prevMessages) => [...prevMessages, newMessage]);
+                        }
+                    } catch (error) {
+                        console.error('Error parsing message:', error);
+                        setError('Error receiving message. Please try again.');
+                    }
                 });
 
                 // Subscribe to error topic
                 client.subscribe(`/topic/user.${user.id}/errors`, (message) => {
-                    const error = JSON.parse(message.body);
-                    setError(error.error);
+                    try {
+                        if (message.body) {
+                            const error = JSON.parse(message.body);
+                            setError(error.error || 'An error occurred');
+                        }
+                    } catch (error) {
+                        console.error('Error parsing error message:', error);
+                        setError('Error processing server message');
+                    }
                 });
             },
             onDisconnect: () => {
@@ -62,14 +78,24 @@ const ChatWindow = ({ receiverId, receiverName, receiverRole }) => {
 
         client.activate();
         setStompClient(client);
-    }, [user.id, reconnectAttempts]);
+
+        return () => {
+            if (client) {
+                client.deactivate();
+            }
+        };
+    }, [user?.id, reconnectAttempts]);
 
     useEffect(() => {
         // Load chat history
         const loadChatHistory = async () => {
+            if (!user?.id || !receiverId) return;
+
             try {
                 const response = await api.get(`/chat/history?userId1=${user.id}&userId2=${receiverId}`);
-                setMessages(response.data);
+                if (response.data) {
+                    setMessages(response.data);
+                }
             } catch (error) {
                 console.error('Error loading chat history:', error);
                 setError('Failed to load chat history. Please try again.');
@@ -77,14 +103,12 @@ const ChatWindow = ({ receiverId, receiverName, receiverRole }) => {
         };
 
         loadChatHistory();
-        connectWebSocket();
+        const cleanup = connectWebSocket();
 
         return () => {
-            if (stompClient) {
-                stompClient.deactivate();
-            }
+            if (cleanup) cleanup();
         };
-    }, [user.id, receiverId, connectWebSocket]);
+    }, [user?.id, receiverId, connectWebSocket]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -96,14 +120,15 @@ const ChatWindow = ({ receiverId, receiverName, receiverRole }) => {
 
     const sendMessage = (e) => {
         e.preventDefault();
-        if (!newMessage.trim() || !isConnected) return;
+        if (!newMessage.trim() || !isConnected || !user?.id) return;
 
         const message = {
             senderId: user.id,
             receiverId: receiverId,
             content: newMessage,
             senderName: user.name,
-            senderRole: user.role
+            senderRole: user.role,
+            timestamp: new Date().toISOString()
         };
 
         try {
@@ -117,6 +142,10 @@ const ChatWindow = ({ receiverId, receiverName, receiverRole }) => {
             setError('Failed to send message. Please try again.');
         }
     };
+
+    if (!user?.id || !receiverId) {
+        return <div className="chat-window">Loading...</div>;
+    }
 
     return (
         <div className="chat-window">
