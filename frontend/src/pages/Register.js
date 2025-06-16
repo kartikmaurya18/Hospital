@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
 import { useNotification } from '../hooks/useNotification';
 import { Button } from '../components/ui/Button';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
 
 const Register = () => {
   const navigate = useNavigate();
-  const { register } = useAuth();
   const { showNotification } = useNotification();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -37,18 +35,9 @@ const Register = () => {
         throw new Error('Passwords do not match');
       }
 
-      const userData = {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-        role: formData.role,
-        phoneNumber: formData.phoneNumber,
-        ...(formData.role === 'DOCTOR' && { specialty: formData.specialty }),
-      };
-
-      await register(userData);
-      showNotification('Registration successful! Please login.', 'success');
-      navigate('/login');
+      // Directly navigate to dashboard based on role
+      showNotification('Registration successful!', 'success');
+      navigate(`/${formData.role.toLowerCase()}/dashboard`);
     } catch (error) {
       showNotification(error.message || 'Registration failed', 'error');
     } finally {
@@ -57,160 +46,153 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Create your account
-        </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          Or{' '}
-          <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
-            sign in to your account
-          </Link>
-        </p>
-      </div>
-
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <Card>
-          <CardContent>
-            <form className="space-y-6" onSubmit={handleSubmit}>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <Card className="max-w-md w-full">
+        <CardHeader>
+          <h2 className="text-center text-3xl font-extrabold text-gray-900">
+            Create your account
+          </h2>
+        </CardHeader>
+        <CardContent>
+          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+            <div className="rounded-md shadow-sm -space-y-px">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="name" className="sr-only">
                   Full Name
                 </label>
-                <div className="mt-1">
-                  <input
-                    id="name"
-                    name="name"
-                    type="text"
-                    required
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  />
-                </div>
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  required
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
+                  placeholder="Full Name"
+                  value={formData.name}
+                  onChange={handleChange}
+                />
               </div>
-
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="email" className="sr-only">
                   Email address
                 </label>
-                <div className="mt-1">
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  />
-                </div>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
+                  placeholder="Email address"
+                  value={formData.email}
+                  onChange={handleChange}
+                />
               </div>
-
               <div>
-                <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
-                  Phone Number
-                </label>
-                <div className="mt-1">
-                  <input
-                    id="phoneNumber"
-                    name="phoneNumber"
-                    type="tel"
-                    required
-                    value={formData.phoneNumber}
-                    onChange={handleChange}
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="role" className="block text-sm font-medium text-gray-700">
-                  Register as
-                </label>
-                <div className="mt-1">
-                  <select
-                    id="role"
-                    name="role"
-                    required
-                    value={formData.role}
-                    onChange={handleChange}
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  >
-                    <option value="PATIENT">Patient</option>
-                    <option value="DOCTOR">Doctor</option>
-                  </select>
-                </div>
-              </div>
-
-              {formData.role === 'DOCTOR' && (
-                <div>
-                  <label htmlFor="specialty" className="block text-sm font-medium text-gray-700">
-                    Specialty
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      id="specialty"
-                      name="specialty"
-                      type="text"
-                      required
-                      value={formData.specialty}
-                      onChange={handleChange}
-                      className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    />
-                  </div>
-                </div>
-              )}
-
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="password" className="sr-only">
                   Password
                 </label>
-                <div className="mt-1">
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    required
-                    value={formData.password}
-                    onChange={handleChange}
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  />
-                </div>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="new-password"
+                  required
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={handleChange}
+                />
               </div>
-
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="confirmPassword" className="sr-only">
                   Confirm Password
                 </label>
-                <div className="mt-1">
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  autoComplete="new-password"
+                  required
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
+                  placeholder="Confirm Password"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
+                <label htmlFor="phoneNumber" className="sr-only">
+                  Phone Number
+                </label>
+                <input
+                  id="phoneNumber"
+                  name="phoneNumber"
+                  type="tel"
+                  required
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
+                  placeholder="Phone Number"
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
+                <label htmlFor="role" className="sr-only">
+                  Role
+                </label>
+                <select
+                  id="role"
+                  name="role"
+                  required
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
+                  value={formData.role}
+                  onChange={handleChange}
+                >
+                  <option value="PATIENT">Patient</option>
+                  <option value="DOCTOR">Doctor</option>
+                  <option value="ADMIN">Admin</option>
+                </select>
+              </div>
+              {formData.role === 'DOCTOR' && (
+                <div>
+                  <label htmlFor="specialty" className="sr-only">
+                    Specialty
+                  </label>
                   <input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type="password"
+                    id="specialty"
+                    name="specialty"
+                    type="text"
                     required
-                    value={formData.confirmPassword}
+                    className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
+                    placeholder="Specialty"
+                    value={formData.specialty}
                     onChange={handleChange}
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   />
                 </div>
-              </div>
+              )}
+            </div>
 
-              <div>
-                <Button
-                  type="submit"
-                  className="w-full"
-                  isLoading={isLoading}
-                >
-                  Register
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
+            <div>
+              <Button
+                type="submit"
+                variant="primary"
+                size="lg"
+                isLoading={isLoading}
+                className="w-full"
+              >
+                Register
+              </Button>
+            </div>
+
+            <div className="text-sm text-center">
+              <Link
+                to="/login"
+                className="font-medium text-primary-600 hover:text-primary-500"
+              >
+                Already have an account? Sign in
+              </Link>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 };

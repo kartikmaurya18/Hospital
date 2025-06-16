@@ -9,36 +9,13 @@ const api = axios.create({
   },
 });
 
-// Request interceptor
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Response interceptor
+// Response interceptor for error handling
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response) {
       // Handle specific error cases
       switch (error.response.status) {
-        case 401:
-          // Unauthorized - clear token and redirect to login
-          localStorage.removeItem('token');
-          window.location.href = '/login';
-          break;
-        case 403:
-          // Forbidden - handle access denied
-          console.error('Access denied:', error.response.data);
-          break;
         case 404:
           // Not found - handle resource not found
           console.error('Resource not found:', error.response.data);

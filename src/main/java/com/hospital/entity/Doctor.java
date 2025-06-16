@@ -1,8 +1,9 @@
 package com.hospital.entity;
 
 import com.hospital.enums.Role;
-
 import jakarta.persistence.*;
+import java.util.Set;
+import java.util.HashSet;
 
 @Entity
 @Table(name = "doctors")
@@ -24,11 +25,23 @@ public class Doctor {
     @Column(nullable = false)
     private String phoneNumber;
 
-    @Column(nullable=false)
+    @Column(nullable = false)
     private String password;
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @ManyToMany
+    @JoinTable(name = "doctor_patient", joinColumns = @JoinColumn(name = "doctor_id"), inverseJoinColumns = @JoinColumn(name = "patient_id"))
+    private Set<Patient> patients = new HashSet<>();
+
+    public Set<Patient> getPatients() {
+        return patients;
+    }
+
+    public void setPatients(Set<Patient> patients) {
+        this.patients = patients;
+    }
 
     public Role getRole() {
         return role;
@@ -78,6 +91,7 @@ public class Doctor {
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
+
     public String getPassword() {
         return password;
     }
@@ -85,6 +99,4 @@ public class Doctor {
     public void setPassword(String password) {
         this.password = password;
     }
-
-  
 }

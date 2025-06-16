@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -48,35 +47,7 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-const ProtectedRoute = ({ children, allowedRoles }) => {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to={`/${user.role.toLowerCase()}/dashboard`} replace />;
-  }
-
-  return children;
-};
-
 const MainLayout = ({ children }) => {
-  const { user } = useAuth();
-  
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
   return (
     <div className="min-h-screen bg-gray-100">
       <Navbar />
@@ -94,85 +65,68 @@ const App = () => {
   return (
     <ErrorBoundary>
       <Router>
-        <AuthProvider>
-          <NotificationProvider>
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
+        <NotificationProvider>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
 
-              {/* Admin Routes */}
-              <Route
-                path="/admin/*"
-                element={
-                  <ProtectedRoute allowedRoles={['ADMIN']}>
-                    <MainLayout>
-                      <Routes>
-                        <Route path="dashboard" element={<AdminDashboard />} />
-                        <Route path="staff" element={<div>Staff Management</div>} />
-                        <Route path="inventory" element={<div>Inventory Management</div>} />
-                        <Route path="billing" element={<div>Billing Management</div>} />
-                        <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
-                      </Routes>
-                    </MainLayout>
-                  </ProtectedRoute>
-                }
-              />
+            {/* Admin Routes */}
+            <Route
+              path="/admin/*"
+              element={
+                <MainLayout>
+                  <Routes>
+                    <Route path="dashboard" element={<AdminDashboard />} />
+                    <Route path="staff" element={<div>Staff Management</div>} />
+                    <Route path="inventory" element={<div>Inventory Management</div>} />
+                    <Route path="billing" element={<div>Billing Management</div>} />
+                    <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
+                  </Routes>
+                </MainLayout>
+              }
+            />
 
-              {/* Doctor Routes */}
-              <Route
-                path="/doctor/*"
-                element={
-                  <ProtectedRoute allowedRoles={['DOCTOR']}>
-                    <MainLayout>
-                      <Routes>
-                        <Route path="dashboard" element={<DoctorDashboard />} />
-                        <Route path="patients" element={<div>Patient List</div>} />
-                        <Route path="appointments" element={<div>Appointments</div>} />
-                        <Route path="prescriptions" element={<div>Prescriptions</div>} />
-                        <Route path="medical-records" element={<div>Medical Records</div>} />
-                        <Route path="*" element={<Navigate to="/doctor/dashboard" replace />} />
-                      </Routes>
-                    </MainLayout>
-                  </ProtectedRoute>
-                }
-              />
+            {/* Doctor Routes */}
+            <Route
+              path="/doctor/*"
+              element={
+                <MainLayout>
+                  <Routes>
+                    <Route path="dashboard" element={<DoctorDashboard />} />
+                    <Route path="patients" element={<div>Patient List</div>} />
+                    <Route path="appointments" element={<div>Appointments</div>} />
+                    <Route path="prescriptions" element={<div>Prescriptions</div>} />
+                    <Route path="medical-records" element={<div>Medical Records</div>} />
+                    <Route path="*" element={<Navigate to="/doctor/dashboard" replace />} />
+                  </Routes>
+                </MainLayout>
+              }
+            />
 
-              {/* Patient Routes */}
-              <Route
-                path="/patient/*"
-                element={
-                  <ProtectedRoute allowedRoles={['PATIENT']}>
-                    <MainLayout>
-                      <Routes>
-                        <Route path="dashboard" element={<PatientDashboard />} />
-                        <Route path="appointments" element={<div>My Appointments</div>} />
-                        <Route path="prescriptions" element={<div>My Prescriptions</div>} />
-                        <Route path="medical-records" element={<div>My Medical Records</div>} />
-                        <Route path="*" element={<Navigate to="/patient/dashboard" replace />} />
-                      </Routes>
-                    </MainLayout>
-                  </ProtectedRoute>
-                }
-              />
+            {/* Patient Routes */}
+            <Route
+              path="/patient/*"
+              element={
+                <MainLayout>
+                  <Routes>
+                    <Route path="dashboard" element={<PatientDashboard />} />
+                    <Route path="appointments" element={<div>My Appointments</div>} />
+                    <Route path="prescriptions" element={<div>My Prescriptions</div>} />
+                    <Route path="medical-records" element={<div>My Medical Records</div>} />
+                    <Route path="*" element={<Navigate to="/patient/dashboard" replace />} />
+                  </Routes>
+                </MainLayout>
+              }
+            />
 
-              {/* Default Route */}
-              <Route
-                path="/"
-                element={
-                  <ProtectedRoute>
-                    {({ user }) => (
-                      <Navigate to={`/${user.role.toLowerCase()}/dashboard`} replace />
-                    )}
-                  </ProtectedRoute>
-                }
-              />
+            {/* Default Route */}
+            <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
 
-              {/* 404 Route */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </NotificationProvider>
-        </AuthProvider>
+            {/* 404 Route */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </NotificationProvider>
       </Router>
     </ErrorBoundary>
   );

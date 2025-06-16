@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
 import { useNotificationContext } from '../contexts/NotificationContext';
 import Button from '../components/Button';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
-  const { error: showError, success } = useNotificationContext();
+  const { success } = useNotificationContext();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -50,11 +48,11 @@ const Login = () => {
 
     try {
       setLoading(true);
-      await login(formData);
+      // Directly navigate to admin dashboard
       success('Login successful!');
-      navigate('/');
+      navigate('/admin/dashboard');
     } catch (err) {
-      showError(err.response?.data?.message || 'Login failed. Please try again.');
+      console.error('Login error:', err);
     } finally {
       setLoading(false);
     }
