@@ -9,6 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/inventory")
+@CrossOrigin(origins = "*") // Optional: Add if you're calling from frontend apps
 public class InventoryController {
 
     private final InventoryService inventoryService;
@@ -19,15 +20,17 @@ public class InventoryController {
 
     // Get all inventory items
     @GetMapping
-    public List<InventoryItem> getAllItems() {
-        return inventoryService.getAllItems();
+    public ResponseEntity<List<InventoryItem>> getAllItems() {
+        List<InventoryItem> items = inventoryService.getAllItems();
+        return ResponseEntity.ok(items);
     }
 
     // Get an inventory item by ID
     @GetMapping("/{id}")
     public ResponseEntity<InventoryItem> getItemById(@PathVariable Long id) {
-        InventoryItem item = inventoryService.getItemById(id);
-        return item != null ? ResponseEntity.ok(item) : ResponseEntity.notFound().build();
+        return inventoryService.getItemById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     // Add a new inventory item

@@ -31,6 +31,12 @@ public class Doctor {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Column(name = "is_available")
+    private boolean isAvailable = true;
+
+    @Column(name = "is_active")
+    private boolean isActive = true;
+
     @ManyToMany
     @JoinTable(name = "doctor_patient", joinColumns = @JoinColumn(name = "doctor_id"), inverseJoinColumns = @JoinColumn(name = "patient_id"))
     private Set<Patient> patients = new HashSet<>();
@@ -49,6 +55,22 @@ public class Doctor {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public boolean isAvailable() {
+        return isAvailable;
+    }
+
+    public void setIsAvailable(boolean isAvailable) {
+        this.isAvailable = isAvailable;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setIsActive(boolean isActive) {
+        this.isActive = isActive;
     }
 
     // Getter and Setter Methods

@@ -1,43 +1,25 @@
 package com.hospital.service;
 
 import com.hospital.entity.Doctor;
-import com.hospital.repository.DoctorRepository;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-@Service
-public class DoctorService {
-    @Autowired
-    private final DoctorRepository doctorRepository;
+public interface DoctorService {
+    Doctor createDoctor(Doctor doctor);
 
-    public DoctorService(DoctorRepository doctorRepository) {
-        this.doctorRepository = doctorRepository;
-    }
+    Doctor updateDoctor(Doctor doctor);
 
-    public List<Doctor> getAllDoctors() {
-        return doctorRepository.findAll();
-    }
+    void deleteDoctor(Long id);
 
-    public Optional<Doctor> getDoctorById(Long id) {
-        return doctorRepository.findById(id);
-    }
+    Optional<Doctor> getDoctorById(Long id);
 
-    public Doctor addDoctor(Doctor doctor) {
-        return doctorRepository.save(doctor);
-    }
+    List<Doctor> getAllDoctors();
 
-    public void deleteDoctor(Long id) {
-        doctorRepository.deleteById(id);
-    }
+    List<Doctor> getDoctorsBySpecialty(String specialty);
 
-    public Doctor findByUsername(String username) {
-        throw new UnsupportedOperationException("Unimplemented method 'findByUsername'");
-    }
+    List<Doctor> getAvailableDoctors();
 
-    public Doctor findByEmail(String email) {
-        return doctorRepository.findByemail(email);
-    }
+    List<Doctor> getActiveDoctors();
+
+    boolean updateDoctorAvailability(Long id, boolean isAvailable);
 }

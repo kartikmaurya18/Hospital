@@ -1,6 +1,6 @@
 package com.hospital.dto;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class MedicalRecordDTO {
     private Long patientId;
@@ -9,7 +9,7 @@ public class MedicalRecordDTO {
     private String diagnosis;
     private String treatment;
     private String prescription;
-    private LocalDate recordDate;
+    private LocalDateTime recordDate;
 
     public Long getPatientId() {
         return patientId;
@@ -59,11 +59,11 @@ public class MedicalRecordDTO {
         this.prescription = prescription;
     }
 
-    public LocalDate getRecordDate() {
+    public LocalDateTime getRecordDate() {
         return recordDate;
     }
 
-    public void setRecordDate(LocalDate recordDate) {
+    public void setRecordDate(LocalDateTime recordDate) {
         this.recordDate = recordDate;
     }
 }

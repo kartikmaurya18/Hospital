@@ -28,7 +28,9 @@ CREATE TABLE doctors (
     email VARCHAR(255) NOT NULL UNIQUE,
     phone_number VARCHAR(20) NOT NULL,
     password VARCHAR(255) NOT NULL,
-    role VARCHAR(20) NOT NULL
+    role VARCHAR(20) NOT NULL,
+    is_available BOOLEAN DEFAULT true,
+    is_active BOOLEAN DEFAULT true
 );
 
 CREATE TABLE staff (
@@ -56,7 +58,9 @@ CREATE TABLE medical_records (
     diagnosis TEXT NOT NULL,
     treatment TEXT NOT NULL,
     prescription TEXT NOT NULL,
-    record_date DATE NOT NULL
+    record_date TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE prescriptions (
@@ -94,11 +98,11 @@ CREATE TABLE chat_messages (
 
 -- Insert initial data with BCrypt hashed passwords
 -- Password for all users is 'password123'
-INSERT INTO doctors (name, specialty, email, phone_number, password, role)
+INSERT INTO doctors (name, specialty, email, phone_number, password, role, is_available, is_active)
 VALUES 
-('Admin User', 'General Medicine', 'admin@hospital.com', '1234567890', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', 'ADMIN'),
-('Dr. John Smith', 'Cardiology', 'john.smith@hospital.com', '2345678901', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', 'DOCTOR'),
-('Dr. Sarah Johnson', 'Pediatrics', 'sarah.johnson@hospital.com', '3456789012', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', 'DOCTOR');
+('Admin User', 'General Medicine', 'admin@hospital.com', '1234567890', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', 'ADMIN', true, true),
+('Dr. John Smith', 'Cardiology', 'john.smith@hospital.com', '2345678901', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', 'DOCTOR', true, true),
+('Dr. Sarah Johnson', 'Pediatrics', 'sarah.johnson@hospital.com', '3456789012', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', 'DOCTOR', true, true);
 
 INSERT INTO patients (name, email, password, phone_number, date_of_birth, medical_history, role)
 VALUES 

@@ -1,111 +1,90 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useAuth } from '../contexts/AuthContext';
 
 const Sidebar = () => {
-  const location = useLocation();
-  const currentPath = location.pathname;
+    const [menuItems, setMenuItems] = useState([]);
+    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [error, setError] = useState(null);
+    const location = useLocation();
+    const navigate = useNavigate();
+    const { user, logout } = useAuth();
 
-  const isActive = (path) => {
-    return currentPath.startsWith(path) ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white';
-  };
+    useEffect(() => {
+        const fetchMenuItems = async () => {
+            try {
+                const response = await axios.get(`/api/sidebar/menu-items?role=${user.role}`);
+                setMenuItems(response.data);
+                setError(null);
+            } catch (error) {
+                setError('Failed to load menu items');
+                console.error('Error fetching menu items:', error);
+            }
+        };
 
-  return (
-    <div className="w-64 bg-gray-800 min-h-screen">
-      <div className="px-4 py-6">
-        <nav className="space-y-2">
-          {/* Admin Navigation */}
-          <div className="space-y-2">
-            <Link
-              to="/admin/dashboard"
-              className={`block px-4 py-2 rounded-md ${isActive('/admin/dashboard')}`}
-            >
-              Dashboard
-            </Link>
-            <Link
-              to="/admin/staff"
-              className={`block px-4 py-2 rounded-md ${isActive('/admin/staff')}`}
-            >
-              Staff Management
-            </Link>
-            <Link
-              to="/admin/inventory"
-              className={`block px-4 py-2 rounded-md ${isActive('/admin/inventory')}`}
-            >
-              Inventory
-            </Link>
-            <Link
-              to="/admin/billing"
-              className={`block px-4 py-2 rounded-md ${isActive('/admin/billing')}`}
-            >
-              Billing
-            </Link>
-          </div>
+        if (user?.role) {
+            fetchMenuItems();
+        }
+    }, [user?.role]);
 
-          {/* Doctor Navigation */}
-          <div className="space-y-2">
-            <Link
-              to="/doctor/dashboard"
-              className={`block px-4 py-2 rounded-md ${isActive('/doctor/dashboard')}`}
-            >
-              Dashboard
-            </Link>
-            <Link
-              to="/doctor/patients"
-              className={`block px-4 py-2 rounded-md ${isActive('/doctor/patients')}`}
-            >
-              Patients
-            </Link>
-            <Link
-              to="/doctor/appointments"
-              className={`block px-4 py-2 rounded-md ${isActive('/doctor/appointments')}`}
-            >
-              Appointments
-            </Link>
-            <Link
-              to="/doctor/prescriptions"
-              className={`block px-4 py-2 rounded-md ${isActive('/doctor/prescriptions')}`}
-            >
-              Prescriptions
-            </Link>
-            <Link
-              to="/doctor/medical-records"
-              className={`block px-4 py-2 rounded-md ${isActive('/doctor/medical-records')}`}
-            >
-              Medical Records
-            </Link>
-          </div>
+    const toggleSidebar = () => {
+        setIsCollapsed(!isCollapsed);
+    };
 
-          {/* Patient Navigation */}
-          <div className="space-y-2">
-            <Link
-              to="/patient/dashboard"
-              className={`block px-4 py-2 rounded-md ${isActive('/patient/dashboard')}`}
-            >
-              Dashboard
-            </Link>
-            <Link
-              to="/patient/appointments"
-              className={`block px-4 py-2 rounded-md ${isActive('/patient/appointments')}`}
-            >
-              My Appointments
-            </Link>
-            <Link
-              to="/patient/prescriptions"
-              className={`block px-4 py-2 rounded-md ${isActive('/patient/prescriptions')}`}
-            >
-              My Prescriptions
-            </Link>
-            <Link
-              to="/patient/medical-records"
-              className={`block px-4 py-2 rounded-md ${isActive('/patient/medical-records')}`}
-            >
-              My Medical Records
-            </Link>
-          </div>
-        </nav>
-      </div>
-    </div>
-  );
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
+
+    if (error) {
+        return (
+            <div className="bg-red-100 text-red-700 p-4">
+                {error}
+            </div>
+        );
+    }
+
+    return (
+        <div className={`bg-gray-800 text-white h-screen ${isCollapsed ? 'w-16' : 'w-64'} transition-all duration-300`}>
+            <div className="p-4 flex justify-between items-center">
+                {!isCollapsed && <h1 className="text-xl font-bold">Hospital</h1>}
+                <button 
+                    onClick={toggleSidebar} 
+                    className="p-2 rounded hover:bg-gray-700"
+                    aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                >
+                    {isCollapsed ? '→' : '←'}
+                </button>
+            </div>
+
+            <nav className="mt-8">
+                {menuItems.map((item, index) => (
+                    item.title === 'Logout' ? (
+                        <button
+                            key={index}
+                            onClick={handleLogout}
+                            className="flex items-center w-full px-4 py-3 hover:bg-gray-700"
+                        >
+                            <span className="material-icons mr-3">{item.icon}</span>
+                            {!isCollapsed && <span>{item.title}</span>}
+                        </button>
+                    ) : (
+                        <Link
+                            key={index}
+                            to={item.path}
+                            className={`flex items-center px-4 py-3 ${
+                                location.pathname === item.path ? 'bg-gray-700' : 'hover:bg-gray-700'
+                            }`}
+                        >
+                            <span className="material-icons mr-3">{item.icon}</span>
+                            {!isCollapsed && <span>{item.title}</span>}
+                        </Link>
+                    )
+                ))}
+            </nav>
+        </div>
+    );
 };
 
 export default Sidebar; 

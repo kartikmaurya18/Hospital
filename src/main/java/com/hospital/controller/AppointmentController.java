@@ -21,14 +21,14 @@ public class AppointmentController {
 
     // 1️⃣ Create Appointment
     @PostMapping("/{doctorId}/{patientId}")
-    
-    public ResponseEntity<?> createAppointment(       
-    @PathVariable Long doctorId,
-    @PathVariable Long patientId,
-    @RequestBody Appointment appointment) {
-        
+
+    public ResponseEntity<?> createAppointment(
+            @PathVariable Long doctorId,
+            @PathVariable Long patientId,
+            @RequestBody Appointment appointment) {
+
         try {
-            Appointment savedAppointment = appointmentService.createAppointment(doctorId,patientId, appointment);
+            Appointment savedAppointment = appointmentService.createAppointment(doctorId, patientId, appointment);
             return ResponseEntity.ok(savedAppointment);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error creating appointment: " + e.getMessage());
@@ -51,18 +51,17 @@ public class AppointmentController {
     public ResponseEntity<?> getAppointmentById(@PathVariable Long id) {
         try {
             Optional<Appointment> appointment = appointmentService.getAppointmentById(id);
-    
+
             if (appointment.isPresent()) {
                 return ResponseEntity.ok(appointment.get());
             } else {
                 return ResponseEntity.status(404).body("Appointment not found with ID: " + id);
             }
-    
+
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error retrieving appointment: " + e.getMessage());
         }
     }
-    
 
     // 4️⃣ Delete Appointment
     @DeleteMapping("/{id}")

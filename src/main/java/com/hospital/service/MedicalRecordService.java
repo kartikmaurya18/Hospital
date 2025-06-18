@@ -1,6 +1,5 @@
 package com.hospital.service;
 
-import com.hospital.dto.MedicalRecordDTO;
 import com.hospital.entity.Appointment;
 import com.hospital.entity.Doctor;
 import com.hospital.entity.MedicalRecord;
@@ -11,6 +10,8 @@ import com.hospital.repository.DoctorRepository;
 import com.hospital.repository.MedicalRecordRepository;
 import com.hospital.repository.PatientRepository;
 import com.hospital.context.UserContext;
+import com.hospital.dto.MedicalRecordDTO;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -63,8 +64,14 @@ public class MedicalRecordService {
                 ? appointmentRepository.findById(dto.getAppointmentId()).orElse(null)
                 : null;
 
-        MedicalRecord medicalRecord = new MedicalRecord(patient, doctor, appointment, dto.getDiagnosis(),
-                dto.getTreatment(), dto.getPrescription(), dto.getRecordDate());
+        MedicalRecord medicalRecord = new MedicalRecord();
+        medicalRecord.setPatient(patient);
+        medicalRecord.setDoctor(doctor);
+        medicalRecord.setAppointment(appointment);
+        medicalRecord.setDiagnosis(dto.getDiagnosis());
+        medicalRecord.setTreatment(dto.getTreatment());
+        medicalRecord.setPrescription(dto.getPrescription());
+        medicalRecord.setRecordDate(dto.getRecordDate());
 
         return medicalRecordRepository.save(medicalRecord);
     }
@@ -113,8 +120,52 @@ public class MedicalRecordService {
         return Optional.empty();
     }
 
+    // Get Medical Records by Patient
+    public List<MedicalRecord> getMedicalRecordsByPatient(Long patientId) {
+        return medicalRecordRepository.findByPatientId(patientId);
+    }
+
+    // Get Medical Records by Doctor
+    public List<MedicalRecord> getMedicalRecordsByDoctor(Long doctorId) {
+        return medicalRecordRepository.findByDoctorId(doctorId);
+    }
+
+    // Update Medical Record
+    public MedicalRecord updateMedicalRecord(Long id, MedicalRecordDTO dto) throws Exception {
+        Role userRole = UserContext.getCurrentUserRole();
+        Long userId = UserContext.getCurrentUserId();
+
+        MedicalRecord medicalRecord = medicalRecordRepository.findById(id)
+                .orElseThrow(() -> new Exception("Medical record not found"));
+
+        // Check if user has permission to update this record
+        if (userRole != Role.ADMIN &&
+                (userRole != Role.DOCTOR || !medicalRecord.getDoctor().getId().equals(userId))) {
+            throw new Exception("Not authorized to update this medical record");
+        }
+
+        // Update only the fields that should be updatable
+        medicalRecord.setDiagnosis(dto.getDiagnosis());
+        medicalRecord.setTreatment(dto.getTreatment());
+        medicalRecord.setPrescription(dto.getPrescription());
+
+        return medicalRecordRepository.save(medicalRecord);
+    }
+
     // Delete Medical Record
-    public void deleteMedicalRecord(Long id) {
+    public void deleteMedicalRecord(Long id) throws Exception {
+        Role userRole = UserContext.getCurrentUserRole();
+        Long userId = UserContext.getCurrentUserId();
+
+        MedicalRecord medicalRecord = medicalRecordRepository.findById(id)
+                .orElseThrow(() -> new Exception("Medical record not found"));
+
+        // Only admin and the doctor who created the record can delete it
+        if (userRole != Role.ADMIN &&
+                (userRole != Role.DOCTOR || !medicalRecord.getDoctor().getId().equals(userId))) {
+            throw new Exception("Not authorized to delete this medical record");
+        }
+
         medicalRecordRepository.deleteById(id);
     }
 }

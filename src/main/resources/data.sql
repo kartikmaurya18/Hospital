@@ -1,9 +1,9 @@
 -- Sample Doctors
-INSERT INTO doctors (name, specialty, email, phone_number, password, role) VALUES
-('Dr. Sarah Johnson', 'Cardiology', 'sarah.johnson@hospital.com', '555-0101', '$2a$10$xn3LI/AjqicFYZFruSwve.681477XaVNaUQbr1gioaWPn4t1KsnmG', 'DOCTOR'),
-('Dr. Michael Chen', 'Neurology', 'michael.chen@hospital.com', '555-0102', '$2a$10$xn3LI/AjqicFYZFruSwve.681477XaVNaUQbr1gioaWPn4t1KsnmG', 'DOCTOR'),
-('Dr. Emily Brown', 'Pediatrics', 'emily.brown@hospital.com', '555-0103', '$2a$10$xn3LI/AjqicFYZFruSwve.681477XaVNaUQbr1gioaWPn4t1KsnmG', 'DOCTOR'),
-('Dr. James Wilson', 'Orthopedics', 'james.wilson@hospital.com', '555-0104', '$2a$10$xn3LI/AjqicFYZFruSwve.681477XaVNaUQbr1gioaWPn4t1KsnmG', 'DOCTOR');
+INSERT INTO doctors (name, specialty, email, phone_number, password, role, is_available, is_active) VALUES
+('Dr. Sarah Johnson', 'Cardiology', 'sarah.johnson@hospital.com', '555-0101', '$2a$10$xn3LI/AjqicFYZFruSwve.681477XaVNaUQbr1gioaWPn4t1KsnmG', 'DOCTOR', true, true),
+('Dr. Michael Chen', 'Neurology', 'michael.chen@hospital.com', '555-0102', '$2a$10$xn3LI/AjqicFYZFruSwve.681477XaVNaUQbr1gioaWPn4t1KsnmG', 'DOCTOR', true, true),
+('Dr. Emily Brown', 'Pediatrics', 'emily.brown@hospital.com', '555-0103', '$2a$10$xn3LI/AjqicFYZFruSwve.681477XaVNaUQbr1gioaWPn4t1KsnmG', 'DOCTOR', true, true),
+('Dr. James Wilson', 'Orthopedics', 'james.wilson@hospital.com', '555-0104', '$2a$10$xn3LI/AjqicFYZFruSwve.681477XaVNaUQbr1gioaWPn4t1KsnmG', 'DOCTOR', true, true);
 
 -- Sample Patients
 INSERT INTO patients (name, email, password, phone_number, date_of_birth, medical_history) VALUES

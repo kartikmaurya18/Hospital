@@ -1,7 +1,7 @@
 package com.hospital.entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "medical_records")
@@ -19,33 +19,37 @@ public class MedicalRecord {
     @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;
 
-    @ManyToOne
-    @JoinColumn(name = "appointment_id", nullable = true)
+    @OneToOne
+    @JoinColumn(name = "appointment_id")
     private Appointment appointment;
+
+    @Column(name = "record_date", nullable = false)
+    private LocalDateTime recordDate;
 
     @Column(nullable = false)
     private String diagnosis;
 
-    @Column(nullable = false)
-    private String treatment;
-
-    @Column(nullable = false)
+    @Column
     private String prescription;
 
-    @Column(nullable = false)
-    private LocalDate recordDate;
+    @Column
+    private String notes;
 
-    // Constructors
-    public MedicalRecord() {}
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
-    public MedicalRecord(Patient patient, Doctor doctor, Appointment appointment, String diagnosis, String treatment, String prescription, LocalDate recordDate) {
-        this.patient = patient;
-        this.doctor = doctor;
-        this.appointment = appointment;
-        this.diagnosis = diagnosis;
-        this.treatment = treatment;
-        this.prescription = prescription;
-        this.recordDate = recordDate;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 
     // Getters and Setters
@@ -81,20 +85,20 @@ public class MedicalRecord {
         this.appointment = appointment;
     }
 
+    public LocalDateTime getRecordDate() {
+        return recordDate;
+    }
+
+    public void setRecordDate(LocalDateTime recordDate) {
+        this.recordDate = recordDate;
+    }
+
     public String getDiagnosis() {
         return diagnosis;
     }
 
     public void setDiagnosis(String diagnosis) {
         this.diagnosis = diagnosis;
-    }
-
-    public String getTreatment() {
-        return treatment;
-    }
-
-    public void setTreatment(String treatment) {
-        this.treatment = treatment;
     }
 
     public String getPrescription() {
@@ -105,11 +109,27 @@ public class MedicalRecord {
         this.prescription = prescription;
     }
 
-    public LocalDate getRecordDate() {
-        return recordDate;
+    public String getNotes() {
+        return notes;
     }
 
-    public void setRecordDate(LocalDate recordDate) {
-        this.recordDate = recordDate;
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

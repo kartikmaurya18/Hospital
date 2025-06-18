@@ -1,31 +1,29 @@
 package com.hospital.controller;
 
-import com.hospital.entity.Admin;
-import com.hospital.entity.Doctor;
-import com.hospital.entity.Patient;
-import com.hospital.service.AdminService;
-import com.hospital.service.DoctorService;
-import com.hospital.service.PatientService;
+import com.hospital.entity.User;
+import com.hospital.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "${app.cors.allowed-origins:http://localhost:3000}")
 public class LoginController {
 
-    @Autowired
-    private DoctorService doctorService;
+    private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    private PatientService patientService;
-
-    @Autowired
-    private AdminService adminService;
+    public LoginController(UserService userService, PasswordEncoder passwordEncoder) {
+        this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
@@ -33,66 +31,54 @@ public class LoginController {
         String password = credentials.get("password");
 
         if (email == null || password == null) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Email and password are required"));
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", "Email and password are required"));
         }
 
-        // Check in Admin table first
-        Admin admin = adminService.findByEmail(email);
-        if (admin != null && password.equals(admin.getPassword())) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("user", admin);
-            response.put("role", "ADMIN");
-            return ResponseEntity.ok(response);
+        Optional<User> userOpt = userService.getUserByEmail(email);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            if (passwordEncoder.matches(password, user.getPassword())) {
+                if (!user.isActive()) {
+                    return ResponseEntity.badRequest()
+                            .body(Map.of("message", "Account is deactivated. Please contact administrator."));
+                }
+
+                Map<String, Object> response = new HashMap<>();
+                response.put("userId", user.getId());
+                response.put("email", user.getEmail());
+                response.put("name", user.getName());
+                response.put("role", user.getRole());
+                response.put("active", user.isActive());
+
+                return ResponseEntity.ok(response);
+            }
         }
 
-        // Check in Doctor table
-        Doctor doctor = doctorService.findByEmail(email);
-        if (doctor != null && password.equals(doctor.getPassword())) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("user", doctor);
-            response.put("role", "DOCTOR");
-            return ResponseEntity.ok(response);
-        }
-
-        // Check in Patient table
-        Patient patient = patientService.findByEmail(email);
-        if (patient != null && password.equals(patient.getPassword())) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("user", patient);
-            response.put("role", "PATIENT");
-            return ResponseEntity.ok(response);
-        }
-
-        return ResponseEntity.badRequest().body(Map.of("message", "Invalid credentials"));
+        return ResponseEntity.badRequest()
+                .body(Map.of("message", "Invalid email or password"));
     }
 
-    @PostMapping("/register/patient")
-    public ResponseEntity<?> registerPatient(@RequestBody Patient patient) {
-        try {
-            Patient savedPatient = patientService.addPatient(patient);
-            return ResponseEntity.ok(savedPatient);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
-        }
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout() {
+        return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
     }
 
-    @PostMapping("/register/doctor")
-    public ResponseEntity<?> registerDoctor(@RequestBody Doctor doctor) {
-        try {
-            Doctor savedDoctor = doctorService.addDoctor(doctor);
-            return ResponseEntity.ok(savedDoctor);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+    @GetMapping("/check-session")
+    public ResponseEntity<?> checkSession(@RequestParam String email) {
+        Optional<User> userOpt = userService.getUserByEmail(email);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            Map<String, Object> response = new HashMap<>();
+            response.put("authenticated", true);
+            response.put("user", Map.of(
+                    "id", user.getId(),
+                    "email", user.getEmail(),
+                    "name", user.getName(),
+                    "role", user.getRole(),
+                    "active", user.isActive()));
+            return ResponseEntity.ok(response);
         }
-    }
-
-    @PostMapping("/register/admin")
-    public ResponseEntity<?> registerAdmin(@RequestBody Admin admin) {
-        try {
-            Admin savedAdmin = adminService.registerAdmin(admin);
-            return ResponseEntity.ok(savedAdmin);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
-        }
+        return ResponseEntity.ok(Map.of("authenticated", false));
     }
 }

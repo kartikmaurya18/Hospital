@@ -1,7 +1,8 @@
 package com.hospital.entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "billing")
@@ -19,62 +20,128 @@ public class Billing {
     @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;
 
-    @Column(nullable = false)
-    private Double amount;
+    @Column(name = "amount", nullable = false)
+    private BigDecimal amount;
 
-    @Column(nullable = false)
-    private LocalDate billingDate;
+    @Column(name = "paid_amount")
+    private BigDecimal paidAmount;
 
-    @Column(nullable = false)
-    private String paymentStatus; // e.g., "Paid", "Pending"
+    @Column(name = "payment_status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status;
 
-    // Getters
+    @Column(name = "billing_date", nullable = false)
+    private LocalDateTime billingDate;
+
+    @Column(name = "due_date")
+    private LocalDateTime dueDate;
+
+    @Column
+    private String description;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
+    // Getters and Setters
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Patient getPatient() {
         return patient;
     }
 
-    public Doctor getDoctor() {
-        return doctor;
-    }
-
-    public Double getAmount() {
-        return amount;
-    }
-
-    public LocalDate getBillingDate() {
-        return billingDate;
-    }
-
-    public String getPaymentStatus() {
-        return paymentStatus;
-    }
-
-    // Setters
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public void setPatient(Patient patient) {
         this.patient = patient;
+    }
+
+    public Doctor getDoctor() {
+        return doctor;
     }
 
     public void setDoctor(Doctor doctor) {
         this.doctor = doctor;
     }
 
-    public void setAmount(Double amount) {
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
-    public void setBillingDate(LocalDate billingDate) {
+    public BigDecimal getPaidAmount() {
+        return paidAmount;
+    }
+
+    public void setPaidAmount(BigDecimal paidAmount) {
+        this.paidAmount = paidAmount;
+    }
+
+    public PaymentStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(PaymentStatus status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getBillingDate() {
+        return billingDate;
+    }
+
+    public void setBillingDate(LocalDateTime billingDate) {
         this.billingDate = billingDate;
     }
 
-    public void setPaymentStatus(String paymentStatus) {
-        this.paymentStatus = paymentStatus;
+    public LocalDateTime getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(LocalDateTime dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

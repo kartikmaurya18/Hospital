@@ -1,6 +1,7 @@
 package com.hospital.entity;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "staff")
@@ -10,17 +11,24 @@ public class Staff {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
     private String role; // Example: Doctor, Nurse, Admin
+
+    @Column
     private String department;
+
+    @Column(name = "contact_number")
     private String contactNumber;
-    private double salary;
+
+    @Column
+    private BigDecimal salary;
 
     // Constructor (Optional)
     public Staff() {
     }
-
-   
 
     // Getters and Setters
     public Long getId() {
@@ -63,11 +71,11 @@ public class Staff {
         this.contactNumber = contactNumber;
     }
 
-    public double getSalary() {
+    public BigDecimal getSalary() {
         return salary;
     }
 
-    public void setSalary(double salary) {
+    public void setSalary(BigDecimal salary) {
         this.salary = salary;
     }
 }
