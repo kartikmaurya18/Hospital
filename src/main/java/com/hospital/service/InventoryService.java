@@ -14,4 +14,10 @@ public interface InventoryService {
     InventoryItem updateItem(Long id, InventoryItem item);
 
     void deleteItem(Long id);
+
+    List<InventoryItem> getLowStockItems();
+
+    List<InventoryItem> getItemsByCategory(String category);
+
+    List<InventoryItem> getItemsBySupplier(String supplier);
 }

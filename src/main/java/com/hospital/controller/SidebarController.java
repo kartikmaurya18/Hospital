@@ -22,7 +22,7 @@ public class SidebarController {
     }
 
     @GetMapping("/menu-items")
-    public ResponseEntity<List<MenuItem>> getMenuItems(@RequestParam UserRole role) {
+    public ResponseEntity<List<MenuItem>> getMenuItems(@RequestParam("role") UserRole role) {
         List<MenuItem> menuItems = sidebarService.getMenuItemsForRole(role);
         return ResponseEntity.ok(menuItems);
     }

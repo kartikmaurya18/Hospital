@@ -1,6 +1,10 @@
 package com.hospital.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import java.time.LocalDateTime;
 
 @Entity
@@ -11,28 +15,36 @@ public class InventoryItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Name is required")
     @Column(nullable = false)
     private String name;
 
     @Column(nullable = false)
     private String description;
 
+    @NotNull(message = "Quantity is required")
+    @Min(value = 0, message = "Quantity cannot be negative")
     @Column(nullable = false)
     private Integer quantity;
 
-    @Column
+    @NotBlank(message = "Supplier is required")
+    @Column(nullable = false)
     private String supplier;
 
-    @Column(name = "minimum_quantity")
+    @NotNull(message = "Minimum quantity is required")
+    @Min(value = 0, message = "Minimum quantity cannot be negative")
+    @Column(name = "minimum_quantity", nullable = false)
     private Integer minimumQuantity;
 
-    @Column(name = "unit_price")
+    @NotNull(message = "Unit price is required")
+    @Positive(message = "Unit price must be positive")
+    @Column(name = "unit_price", nullable = false)
     private Double unitPrice;
 
     @Column(name = "last_restocked")
     private LocalDateTime lastRestocked;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
@@ -42,6 +54,9 @@ public class InventoryItem {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        if (minimumQuantity == null) {
+            minimumQuantity = 10; // Default minimum quantity
+        }
     }
 
     @PreUpdate
@@ -54,13 +69,17 @@ public class InventoryItem {
     }
 
     // Parameterized Constructor
-    public InventoryItem(String name, Integer quantity, String supplier) {
+    public InventoryItem(String name, String description, Integer quantity, String supplier,
+            Integer minimumQuantity, Double unitPrice) {
         this.name = name;
+        this.description = description;
         this.quantity = quantity;
         this.supplier = supplier;
+        this.minimumQuantity = minimumQuantity;
+        this.unitPrice = unitPrice;
     }
 
-    // Getter and Setter for id
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -69,7 +88,6 @@ public class InventoryItem {
         this.id = id;
     }
 
-    // Getter and Setter for name
     public String getName() {
         return name;
     }
@@ -78,7 +96,6 @@ public class InventoryItem {
         this.name = name;
     }
 
-    // Getter and Setter for description
     public String getDescription() {
         return description;
     }
@@ -87,7 +104,6 @@ public class InventoryItem {
         this.description = description;
     }
 
-    // Getter and Setter for quantity
     public Integer getQuantity() {
         return quantity;
     }
@@ -96,7 +112,6 @@ public class InventoryItem {
         this.quantity = quantity;
     }
 
-    // Getter and Setter for supplier
     public String getSupplier() {
         return supplier;
     }
