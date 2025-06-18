@@ -1,7 +1,6 @@
 package com.hospital.entity;
 
 import jakarta.persistence.*;
-import com.hospital.enums.UserRole;
 
 @Entity
 @Table(name = "menu_items")

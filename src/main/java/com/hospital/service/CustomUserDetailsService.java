@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Optional;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -42,16 +43,18 @@ public class CustomUserDetailsService implements UserDetailsService {
                     Collections.singletonList(new SimpleGrantedAuthority("ROLE_ADMIN")));
         }
 
-        Doctor doctor = doctorRepository.findByemail(email);
-        if (doctor != null) {
+        Optional<Doctor> doctorOpt = doctorRepository.findByEmail(email);
+        if (doctorOpt.isPresent()) {
+            Doctor doctor = doctorOpt.get();
             return new User(
                     doctor.getEmail(),
                     doctor.getPassword(),
                     Collections.singletonList(new SimpleGrantedAuthority("ROLE_DOCTOR")));
         }
 
-        Patient patient = patientRepository.findByEmail(email);
-        if (patient != null) {
+        Optional<Patient> patientOpt = patientRepository.findByEmail(email);
+        if (patientOpt.isPresent()) {
+            Patient patient = patientOpt.get();
             return new User(
                     patient.getEmail(),
                     patient.getPassword(),

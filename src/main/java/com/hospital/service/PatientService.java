@@ -37,7 +37,7 @@ public class PatientService {
         throw new UnsupportedOperationException("Unimplemented method 'findByUsername'");
     }
 
-    public Patient findByEmail(String email) {
+    public Optional<Patient> findByEmail(String email) {
         return patientRepository.findByEmail(email);
     }
 }

@@ -30,6 +30,9 @@ public class MedicalRecord {
     private String diagnosis;
 
     @Column
+    private String treatment;
+
+    @Column
     private String prescription;
 
     @Column
@@ -99,6 +102,14 @@ public class MedicalRecord {
 
     public void setDiagnosis(String diagnosis) {
         this.diagnosis = diagnosis;
+    }
+
+    public String getTreatment() {
+        return treatment;
+    }
+
+    public void setTreatment(String treatment) {
+        this.treatment = treatment;
     }
 
     public String getPrescription() {

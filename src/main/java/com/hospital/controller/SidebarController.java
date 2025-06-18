@@ -1,7 +1,7 @@
 package com.hospital.controller;
 
 import com.hospital.entity.MenuItem;
-import com.hospital.entity.User;
+import com.hospital.entity.UserRole;
 import com.hospital.service.SidebarService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +22,8 @@ public class SidebarController {
     }
 
     @GetMapping("/menu-items")
-    public ResponseEntity<List<MenuItem>> getMenuItems(@RequestParam User role) {
-        List<MenuItem> menuItems = sidebarService.getMenuItemsForRole(user.getRole);
+    public ResponseEntity<List<MenuItem>> getMenuItems(@RequestParam UserRole role) {
+        List<MenuItem> menuItems = sidebarService.getMenuItemsForRole(role);
         return ResponseEntity.ok(menuItems);
     }
 }
