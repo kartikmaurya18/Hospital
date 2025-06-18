@@ -1,90 +1,14 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Client } from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
+import React, { useState, useEffect, useRef } from 'react';
 import api from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import './ChatWindow.css';
 
-const MAX_RECONNECT_ATTEMPTS = 5;
-const RECONNECT_DELAY = 3000;
-
 const ChatWindow = ({ receiverId, receiverName, receiverRole }) => {
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
-    const [stompClient, setStompClient] = useState(null);
-    const [isConnected, setIsConnected] = useState(false);
     const [error, setError] = useState(null);
-    const [reconnectAttempts, setReconnectAttempts] = useState(0);
     const messagesEndRef = useRef(null);
     const { user } = useAuth();
-
-    const connectWebSocket = useCallback(() => {
-        if (!user?.id) return; // Don't connect if user is not available
-
-        const socket = new SockJS('http://localhost:8080/api/ws');
-        const client = new Client({
-            webSocketFactory: () => socket,
-            onConnect: () => {
-                console.log('Connected to WebSocket');
-                setIsConnected(true);
-                setError(null);
-                setReconnectAttempts(0);
-                
-                // Subscribe to user's topic
-                client.subscribe(`/topic/user.${user.id}`, (message) => {
-                    try {
-                        if (message.body) {
-                            const newMessage = JSON.parse(message.body);
-                            setMessages((prevMessages) => [...prevMessages, newMessage]);
-                        }
-                    } catch (error) {
-                        console.error('Error parsing message:', error);
-                        setError('Error receiving message. Please try again.');
-                    }
-                });
-
-                // Subscribe to error topic
-                client.subscribe(`/topic/user.${user.id}/errors`, (message) => {
-                    try {
-                        if (message.body) {
-                            const error = JSON.parse(message.body);
-                            setError(error.error || 'An error occurred');
-                        }
-                    } catch (error) {
-                        console.error('Error parsing error message:', error);
-                        setError('Error processing server message');
-                    }
-                });
-            },
-            onDisconnect: () => {
-                console.log('Disconnected from WebSocket');
-                setIsConnected(false);
-                
-                // Attempt to reconnect
-                if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
-                    setTimeout(() => {
-                        setReconnectAttempts(prev => prev + 1);
-                        connectWebSocket();
-                    }, RECONNECT_DELAY);
-                } else {
-                    setError('Unable to connect to chat server. Please refresh the page.');
-                }
-            },
-            onStompError: (frame) => {
-                console.error('STOMP error:', frame);
-                setError('Connection error. Please try again.');
-            }
-        });
-
-        client.activate();
-        setStompClient(client);
-
-        return () => {
-            if (client) {
-                client.deactivate();
-            }
-        };
-    }, [user?.id, reconnectAttempts]);
 
     useEffect(() => {
         // Load chat history
@@ -103,12 +27,11 @@ const ChatWindow = ({ receiverId, receiverName, receiverRole }) => {
         };
 
         loadChatHistory();
-        const cleanup = connectWebSocket();
+        // Set up polling for new messages
+        const pollInterval = setInterval(loadChatHistory, 5000); // Poll every 5 seconds
 
-        return () => {
-            if (cleanup) cleanup();
-        };
-    }, [user?.id, receiverId, connectWebSocket]);
+        return () => clearInterval(pollInterval);
+    }, [user?.id, receiverId]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -118,9 +41,9 @@ const ChatWindow = ({ receiverId, receiverName, receiverRole }) => {
         scrollToBottom();
     }, [messages]);
 
-    const sendMessage = (e) => {
+    const sendMessage = async (e) => {
         e.preventDefault();
-        if (!newMessage.trim() || !isConnected || !user?.id) return;
+        if (!newMessage.trim() || !user?.id) return;
 
         const message = {
             senderId: user.id,
@@ -132,10 +55,8 @@ const ChatWindow = ({ receiverId, receiverName, receiverRole }) => {
         };
 
         try {
-            stompClient.publish({
-                destination: '/app/chat.send',
-                body: JSON.stringify(message)
-            });
+            await api.post('/chat/send', message);
+            setMessages(prevMessages => [...prevMessages, message]);
             setNewMessage('');
         } catch (error) {
             console.error('Error sending message:', error);
@@ -151,11 +72,6 @@ const ChatWindow = ({ receiverId, receiverName, receiverRole }) => {
         <div className="chat-window">
             <div className="chat-header">
                 <h3>{receiverName} ({receiverRole})</h3>
-                {!isConnected && (
-                    <div className="connection-status">
-                        Reconnecting... ({reconnectAttempts}/{MAX_RECONNECT_ATTEMPTS})
-                    </div>
-                )}
             </div>
             {error && (
                 <div className="error-message">
@@ -185,10 +101,9 @@ const ChatWindow = ({ receiverId, receiverName, receiverRole }) => {
                     type="text"
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder={isConnected ? "Type a message..." : "Connecting..."}
-                    disabled={!isConnected}
+                    placeholder="Type a message..."
                 />
-                <button type="submit" disabled={!isConnected || !newMessage.trim()}>
+                <button type="submit" disabled={!newMessage.trim()}>
                     Send
                 </button>
             </form>
