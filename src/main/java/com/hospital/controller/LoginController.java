@@ -38,10 +38,17 @@ public class LoginController {
         Optional<User> userOpt = userService.getUserByEmail(email);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            if (passwordEncoder.matches(password, user.getPassword())) {
+            // For backward compatibility, check if password is plain text
+            if (user.getPassword().equals(password) || passwordEncoder.matches(password, user.getPassword())) {
                 if (!user.isActive()) {
                     return ResponseEntity.badRequest()
                             .body(Map.of("message", "Account is deactivated. Please contact administrator."));
+                }
+
+                // If password was plain text, update it to hashed version
+                if (user.getPassword().equals(password)) {
+                    user.setPassword(passwordEncoder.encode(password));
+                    userService.updateUser(user);
                 }
 
                 Map<String, Object> response = new HashMap<>();
@@ -62,6 +69,28 @@ public class LoginController {
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
         return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
+    }
+
+    @PostMapping("/update-password")
+    public ResponseEntity<?> updatePassword(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String newPassword = request.get("password");
+
+        if (email == null || newPassword == null) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", "Email and password are required"));
+        }
+
+        Optional<User> userOpt = userService.getUserByEmail(email);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userService.updateUser(user);
+            return ResponseEntity.ok(Map.of("message", "Password updated successfully"));
+        }
+
+        return ResponseEntity.badRequest()
+                .body(Map.of("message", "User not found"));
     }
 
     @GetMapping("/check-session")

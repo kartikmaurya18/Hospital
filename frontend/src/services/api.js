@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080/api';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -9,7 +9,7 @@ const api = axios.create({
   },
 });
 
-// Response interceptor for error handling
+// Response interceptor for handling errors
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -17,16 +17,15 @@ api.interceptors.response.use(
       // Handle specific error cases
       switch (error.response.status) {
         case 404:
-          // Not found - handle resource not found
-          console.error('Resource not found:', error.response.data);
+          // Not found - show error message
+          console.error('Resource not found');
           break;
         case 500:
-          // Server error - handle internal server error
-          console.error('Server error:', error.response.data);
+          // Server error - show error message
+          console.error('Server error occurred');
           break;
         default:
-          // Handle other errors
-          console.error('API error:', error.response.data);
+          console.error('An error occurred:', error.response.data);
       }
     } else if (error.request) {
       // Network error
@@ -39,94 +38,93 @@ api.interceptors.response.use(
   }
 );
 
-// Auth endpoints
-export const auth = {
-  login: (credentials) => api.post('/auth/login', credentials),
-  register: (userData) => api.post('/auth/register', userData),
-  verifyToken: () => api.get('/auth/verify'),
-  updateProfile: (userData) => api.put('/auth/profile', userData),
-  changePassword: (passwordData) => api.put('/auth/change-password', passwordData),
-};
-
 // Patient endpoints
 export const patients = {
-  getAll: (params) => api.get('/patients', { params }),
-  getById: (id) => api.get(`/patients/${id}`),
-  create: (data) => api.post('/patients', data),
-  update: (id, data) => api.put(`/patients/${id}`, data),
-  delete: (id) => api.delete(`/patients/${id}`),
+  getAll: (params) => api.get('/api/patients', { params }),
+  getById: (id) => api.get(`/api/patients/${id}`),
+  create: (data) => api.post('/api/patients', data),
+  update: (id, data) => api.put(`/api/patients/${id}`, data),
+  delete: (id) => api.delete(`/api/patients/${id}`),
 };
 
 // Doctor endpoints
 export const doctors = {
-  getAll: (params) => api.get('/doctors', { params }),
-  getById: (id) => api.get(`/doctors/${id}`),
-  create: (data) => api.post('/doctors', data),
-  update: (id, data) => api.put(`/doctors/${id}`, data),
-  delete: (id) => api.delete(`/doctors/${id}`),
+  getAll: (params) => api.get('/api/doctors', { params }),
+  getById: (id) => api.get(`/api/doctors/${id}`),
+  create: (data) => api.post('/api/doctors', data),
+  update: (id, data) => api.put(`/api/doctors/${id}`, data),
+  delete: (id) => api.delete(`/api/doctors/${id}`),
 };
 
 // Appointment endpoints
 export const appointments = {
-  getAll: (params) => api.get('/appointments', { params }),
-  getById: (id) => api.get(`/appointments/${id}`),
-  create: (data) => api.post('/appointments', data),
-  update: (id, data) => api.put(`/appointments/${id}`, data),
-  delete: (id) => api.delete(`/appointments/${id}`),
+  getAll: (params) => api.get('/api/appointments', { params }),
+  getById: (id) => api.get(`/api/appointments/${id}`),
+  create: (data) => api.post('/api/appointments', data),
+  update: (id, data) => api.put(`/api/appointments/${id}`, data),
+  delete: (id) => api.delete(`/api/appointments/${id}`),
 };
 
 // Medical record endpoints
 export const medicalRecords = {
-  getAll: (params) => api.get('/medical-records', { params }),
-  getById: (id) => api.get(`/medical-records/${id}`),
-  create: (data) => api.post('/medical-records', data),
-  update: (id, data) => api.put(`/medical-records/${id}`, data),
-  delete: (id) => api.delete(`/medical-records/${id}`),
+  getAll: (params) => api.get('/api/medical-records', { params }),
+  getById: (id) => api.get(`/api/medical-records/${id}`),
+  create: (data) => api.post('/api/medical-records', data),
+  update: (id, data) => api.put(`/api/medical-records/${id}`, data),
+  delete: (id) => api.delete(`/api/medical-records/${id}`),
 };
 
 // Prescription endpoints
 export const prescriptions = {
-  getAll: (params) => api.get('/prescriptions', { params }),
-  getById: (id) => api.get(`/prescriptions/${id}`),
-  create: (data) => api.post('/prescriptions', data),
-  update: (id, data) => api.put(`/prescriptions/${id}`, data),
-  delete: (id) => api.delete(`/prescriptions/${id}`),
+  getAll: (params) => api.get('/api/prescriptions', { params }),
+  getById: (id) => api.get(`/api/prescriptions/${id}`),
+  create: (data) => api.post('/api/prescriptions', data),
+  update: (id, data) => api.put(`/api/prescriptions/${id}`, data),
+  delete: (id) => api.delete(`/api/prescriptions/${id}`),
 };
 
 // Billing endpoints
 export const billing = {
-  getAll: (params) => api.get('/billing', { params }),
-  getById: (id) => api.get(`/billing/${id}`),
-  create: (data) => api.post('/billing', data),
-  update: (id, data) => api.put(`/billing/${id}`, data),
-  delete: (id) => api.delete(`/billing/${id}`),
+  getAll: (params) => api.get('/api/billing', { params }),
+  getById: (id) => api.get(`/api/billing/${id}`),
+  create: (data) => api.post('/api/billing', data),
+  update: (id, data) => api.put(`/api/billing/${id}`, data),
+  delete: (id) => api.delete(`/api/billing/${id}`),
 };
 
 // Inventory endpoints
 export const inventory = {
-  getAll: (params) => api.get('/inventory', { params }),
-  getById: (id) => api.get(`/inventory/${id}`),
-  create: (data) => api.post('/inventory', data),
-  update: (id, data) => api.put(`/inventory/${id}`, data),
-  delete: (id) => api.delete(`/inventory/${id}`),
+  getAll: (params) => api.get('/api/inventory', { params }),
+  getById: (id) => api.get(`/api/inventory/${id}`),
+  create: (data) => api.post('/api/inventory', data),
+  update: (id, data) => api.put(`/api/inventory/${id}`, data),
+  delete: (id) => api.delete(`/api/inventory/${id}`),
 };
 
 // Staff endpoints
 export const staff = {
-  getAll: (params) => api.get('/staff', { params }),
-  getById: (id) => api.get(`/staff/${id}`),
-  create: (data) => api.post('/staff', data),
-  update: (id, data) => api.put(`/staff/${id}`, data),
-  delete: (id) => api.delete(`/staff/${id}`),
+  getAll: (params) => api.get('/api/staff', { params }),
+  getById: (id) => api.get(`/api/staff/${id}`),
+  create: (data) => api.post('/api/staff', data),
+  update: (id, data) => api.put(`/api/staff/${id}`, data),
+  delete: (id) => api.delete(`/api/staff/${id}`),
 };
 
 // Chat endpoints
 export const chat = {
-  getAll: (params) => api.get('/chat', { params }),
-  getById: (id) => api.get(`/chat/${id}`),
-  create: (data) => api.post('/chat', data),
-  update: (id, data) => api.put(`/chat/${id}`, data),
-  delete: (id) => api.delete(`/chat/${id}`),
+  getAll: (params) => api.get('/api/chat', { params }),
+  getById: (id) => api.get(`/api/chat/${id}`),
+  create: (data) => api.post('/api/chat', data),
+  update: (id, data) => api.put(`/api/chat/${id}`, data),
+  delete: (id) => api.delete(`/api/chat/${id}`),
+};
+
+// Auth endpoints
+const auth = {
+  login: (credentials) => api.post('/api/auth/login', credentials),
+  logout: () => api.post('/api/auth/logout'),
+  checkSession: () => api.get('/api/auth/check-session'),
+  updatePassword: (data) => api.post('/api/auth/update-password', data),
 };
 
 export default api; 

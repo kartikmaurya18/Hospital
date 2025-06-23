@@ -50,20 +50,6 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-const MainLayout = ({ children }) => {
-  return (
-    <div className="min-h-screen bg-gray-100">
-      <Navbar />
-      <div className="flex">
-        <Sidebar />
-        <main className="flex-1 p-4">
-          {children}
-        </main>
-      </div>
-    </div>
-  );
-};
-
 const ProtectedRoute = ({ children, allowedRoles }) => {
     const { user, loading } = useAuth();
 
@@ -76,125 +62,75 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     }
 
     if (!user) {
-        return <Navigate to="/login" />;
+        return <Navigate to="/login" replace />;
     }
 
     if (allowedRoles && !allowedRoles.includes(user.role)) {
-        return <Navigate to="/dashboard" />;
+        return <Navigate to={`/${user.role.toLowerCase()}/dashboard`} replace />;
     }
 
     return <Layout>{children}</Layout>;
 };
 
 const App = () => {
-    return (
-        <ErrorBoundary>
-            <AuthProvider>
-                <Router>
-                    <Routes>
-                        <Route path="/login" element={<Login />} />
-                        
-                        {/* Admin Routes */}
-                        <Route path="/admin/patients" element={
-                            <ProtectedRoute allowedRoles={['ADMIN']}>
-                                <PatientList />
-                            </ProtectedRoute>
-                        } />
-                        <Route path="/admin/doctors" element={
-                            <ProtectedRoute allowedRoles={['ADMIN']}>
-                                <DoctorList />
-                            </ProtectedRoute>
-                        } />
-                        <Route path="/admin/appointments" element={
-                            <ProtectedRoute allowedRoles={['ADMIN']}>
-                                <AppointmentList />
-                            </ProtectedRoute>
-                        } />
-                        <Route path="/admin/medical-records" element={
-                            <ProtectedRoute allowedRoles={['ADMIN']}>
-                                <MedicalRecordList />
-                            </ProtectedRoute>
-                        } />
-                        <Route path="/admin/prescriptions" element={
-                            <ProtectedRoute allowedRoles={['ADMIN']}>
-                                <PrescriptionList />
-                            </ProtectedRoute>
-                        } />
-                        <Route path="/admin/billing" element={
-                            <ProtectedRoute allowedRoles={['ADMIN']}>
-                                <BillingList />
-                            </ProtectedRoute>
-                        } />
-                        <Route path="/admin/notifications" element={
-                            <ProtectedRoute allowedRoles={['ADMIN']}>
-                                <NotificationList />
-                            </ProtectedRoute>
-                        } />
+  return (
+    <ErrorBoundary>
+      <AuthProvider>
+        <Router>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin/*" element={
+              <ProtectedRoute allowedRoles={['ADMIN']}>
+                <Routes>
+                  <Route path="dashboard" element={<Dashboard />} />
+                  <Route path="patients" element={<PatientList />} />
+                  <Route path="doctors" element={<DoctorList />} />
+                  <Route path="appointments" element={<AppointmentList />} />
+                  <Route path="medical-records" element={<MedicalRecordList />} />
+                  <Route path="prescriptions" element={<PrescriptionList />} />
+                  <Route path="billing" element={<BillingList />} />
+                  <Route path="notifications" element={<NotificationList />} />
+                </Routes>
+              </ProtectedRoute>
+            } />
 
-                        {/* Doctor Routes */}
-                        <Route path="/doctor/appointments" element={
-                            <ProtectedRoute allowedRoles={['DOCTOR']}>
-                                <AppointmentList />
-                            </ProtectedRoute>
-                        } />
-                        <Route path="/doctor/medical-records" element={
-                            <ProtectedRoute allowedRoles={['DOCTOR']}>
-                                <MedicalRecordList />
-                            </ProtectedRoute>
-                        } />
-                        <Route path="/doctor/prescriptions" element={
-                            <ProtectedRoute allowedRoles={['DOCTOR']}>
-                                <PrescriptionList />
-                            </ProtectedRoute>
-                        } />
-                        <Route path="/doctor/notifications" element={
-                            <ProtectedRoute allowedRoles={['DOCTOR']}>
-                                <NotificationList />
-                            </ProtectedRoute>
-                        } />
+            {/* Doctor Routes */}
+            <Route path="/doctor/*" element={
+              <ProtectedRoute allowedRoles={['DOCTOR']}>
+                <Routes>
+                  <Route path="dashboard" element={<Dashboard />} />
+                  <Route path="appointments" element={<AppointmentList />} />
+                  <Route path="medical-records" element={<MedicalRecordList />} />
+                  <Route path="prescriptions" element={<PrescriptionList />} />
+                  <Route path="notifications" element={<NotificationList />} />
+                </Routes>
+              </ProtectedRoute>
+            } />
 
-                        {/* Patient Routes */}
-                        <Route path="/patient/appointments" element={
-                            <ProtectedRoute allowedRoles={['PATIENT']}>
-                                <AppointmentList />
-                            </ProtectedRoute>
-                        } />
-                        <Route path="/patient/medical-records" element={
-                            <ProtectedRoute allowedRoles={['PATIENT']}>
-                                <MedicalRecordList />
-                            </ProtectedRoute>
-                        } />
-                        <Route path="/patient/prescriptions" element={
-                            <ProtectedRoute allowedRoles={['PATIENT']}>
-                                <PrescriptionList />
-                            </ProtectedRoute>
-                        } />
-                        <Route path="/patient/billing" element={
-                            <ProtectedRoute allowedRoles={['PATIENT']}>
-                                <BillingList />
-                            </ProtectedRoute>
-                        } />
-                        <Route path="/patient/notifications" element={
-                            <ProtectedRoute allowedRoles={['PATIENT']}>
-                                <NotificationList />
-                            </ProtectedRoute>
-                        } />
+            {/* Patient Routes */}
+            <Route path="/patient/*" element={
+              <ProtectedRoute allowedRoles={['PATIENT']}>
+                <Routes>
+                  <Route path="dashboard" element={<Dashboard />} />
+                  <Route path="appointments" element={<AppointmentList />} />
+                  <Route path="medical-records" element={<MedicalRecordList />} />
+                  <Route path="prescriptions" element={<PrescriptionList />} />
+                  <Route path="billing" element={<BillingList />} />
+                  <Route path="notifications" element={<NotificationList />} />
+                </Routes>
+              </ProtectedRoute>
+            } />
 
-                        {/* Common Routes */}
-                        <Route path="/dashboard" element={
-                            <ProtectedRoute>
-                                <Dashboard />
-                            </ProtectedRoute>
-                        } />
-
-                        {/* Default Route */}
-                        <Route path="/" element={<Navigate to="/dashboard" />} />
-                        <Route path="*" element={<Navigate to="/dashboard" />} />
-                    </Routes>
-                </Router>
-            </AuthProvider>
-        </ErrorBoundary>
-    );
+            {/* Default Route */}
+            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </Routes>
+        </Router>
+      </AuthProvider>
+    </ErrorBoundary>
+  );
 };
 
 export default App;

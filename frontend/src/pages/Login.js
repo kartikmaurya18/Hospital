@@ -26,10 +26,11 @@ const Login = () => {
         setLoading(true);
 
         try {
-            await login(formData.email, formData.password);
-            navigate('/dashboard');
+            const userData = await login(formData.email, formData.password);
+            // Redirect based on user role
+            navigate(`/${userData.role.toLowerCase()}/dashboard`);
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to login');
+            setError(err.message || 'Failed to login');
         } finally {
             setLoading(false);
         }
