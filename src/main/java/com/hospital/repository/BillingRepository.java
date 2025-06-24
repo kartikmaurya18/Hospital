@@ -15,11 +15,11 @@ public interface BillingRepository extends JpaRepository<Billing, Long> {
 
     List<Billing> findByDoctor(Doctor doctor);
 
-    List<Billing> findByPaymentStatus(PaymentStatus status);
+    List<Billing> findByStatus(PaymentStatus status);
 
-    List<Billing> findByPaymentDateBetween(LocalDateTime start, LocalDateTime end);
+    List<Billing> findByBillingDateBetween(LocalDateTime start, LocalDateTime end);
 
-    List<Billing> findByPatientAndPaymentDateBetween(Patient patient, LocalDateTime start, LocalDateTime end);
+    List<Billing> findByPatientAndBillingDateBetween(Patient patient, LocalDateTime start, LocalDateTime end);
 
-    List<Billing> findByDoctorAndPaymentDateBetween(Doctor doctor, LocalDateTime start, LocalDateTime end);
+    List<Billing> findByDoctorAndBillingDateBetween(Doctor doctor, LocalDateTime start, LocalDateTime end);
 }

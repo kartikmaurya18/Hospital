@@ -63,7 +63,7 @@ public class DoctorServiceImpl implements DoctorService {
     @Override
     @Transactional(readOnly = true)
     public List<Doctor> getActiveDoctors() {
-        return doctorRepository.findByActive(true);
+        return doctorRepository.findByIsActive(true);
     }
 
     @Override

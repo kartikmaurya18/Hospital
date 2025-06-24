@@ -4,7 +4,6 @@ import com.hospital.entity.User;
 import com.hospital.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -17,12 +16,10 @@ import java.util.Optional;
 public class LoginController {
 
     private final UserService userService;
-    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public LoginController(UserService userService, PasswordEncoder passwordEncoder) {
+    public LoginController(UserService userService) {
         this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/login")
@@ -38,17 +35,10 @@ public class LoginController {
         Optional<User> userOpt = userService.getUserByEmail(email);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            // For backward compatibility, check if password is plain text
-            if (user.getPassword().equals(password) || passwordEncoder.matches(password, user.getPassword())) {
+            if (user.getPassword().equals(password)) {
                 if (!user.isActive()) {
                     return ResponseEntity.badRequest()
                             .body(Map.of("message", "Account is deactivated. Please contact administrator."));
-                }
-
-                // If password was plain text, update it to hashed version
-                if (user.getPassword().equals(password)) {
-                    user.setPassword(passwordEncoder.encode(password));
-                    userService.updateUser(user);
                 }
 
                 Map<String, Object> response = new HashMap<>();
@@ -84,7 +74,7 @@ public class LoginController {
         Optional<User> userOpt = userService.getUserByEmail(email);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            user.setPassword(passwordEncoder.encode(newPassword));
+            user.setPassword(newPassword);
             userService.updateUser(user);
             return ResponseEntity.ok(Map.of("message", "Password updated successfully"));
         }

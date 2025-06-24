@@ -8,11 +8,11 @@ import java.util.List;
 
 @Repository
 public interface InventoryRepository extends JpaRepository<InventoryItem, Long> {
-    List<InventoryItem> findByCategory(String category);
+    List<InventoryItem> findByQuantityLessThanEqual(Integer quantity);
 
-    List<InventoryItem> findByQuantityLessThanEqual(Integer minimumQuantity);
+    List<InventoryItem> findBySupplier(String supplier);
 
-    List<InventoryItem> findByExpiryDateBefore(LocalDateTime date);
+    List<InventoryItem> findByLastRestockedBefore(LocalDateTime date);
 
-    List<InventoryItem> findBySupplierName(String supplierName);
+    List<InventoryItem> findByNameContainingIgnoreCase(String name);
 }

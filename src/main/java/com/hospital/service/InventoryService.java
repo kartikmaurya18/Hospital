@@ -17,7 +17,7 @@ public interface InventoryService {
 
     List<InventoryItem> getLowStockItems();
 
-    List<InventoryItem> getItemsByCategory(String category);
+    List<InventoryItem> getItemsByName(String name);
 
     List<InventoryItem> getItemsBySupplier(String supplier);
 }

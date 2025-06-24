@@ -76,13 +76,13 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<InventoryItem> getItemsByCategory(String category) {
-        return inventoryRepository.findByCategory(category);
+    public List<InventoryItem> getItemsByName(String name) {
+        return inventoryRepository.findByNameContainingIgnoreCase(name);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<InventoryItem> getItemsBySupplier(String supplier) {
-        return inventoryRepository.findBySupplierName(supplier);
+        return inventoryRepository.findBySupplier(supplier);
     }
 }

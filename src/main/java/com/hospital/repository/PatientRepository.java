@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface PatientRepository extends JpaRepository<Patient, Long> {
     List<Patient> findByAssignedDoctor(Doctor doctor);
 
-    List<Patient> findByActive(boolean active);
+    List<Patient> findByIsActive(boolean isActive);
 
     Optional<Patient> findByEmail(String email);
 }

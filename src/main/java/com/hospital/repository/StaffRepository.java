@@ -9,9 +9,9 @@ import java.util.List;
 public interface StaffRepository extends JpaRepository<Staff, Long> {
     List<Staff> findByDepartment(String department);
 
-    List<Staff> findByJobTitle(String jobTitle);
+    List<Staff> findByRole(String role);
 
-    List<Staff> findByIsActive(boolean isActive);
+    List<Staff> findByNameContainingIgnoreCase(String name);
 
-    Staff findByEmployeeId(String employeeId);
+    List<Staff> findByDepartmentAndRole(String department, String role);
 }

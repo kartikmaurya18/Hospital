@@ -19,7 +19,7 @@ public class InventoryItem {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String description;
 
     @NotNull(message = "Quantity is required")
@@ -31,14 +31,12 @@ public class InventoryItem {
     @Column(nullable = false)
     private String supplier;
 
-    @NotNull(message = "Minimum quantity is required")
     @Min(value = 0, message = "Minimum quantity cannot be negative")
-    @Column(name = "minimum_quantity", nullable = false)
+    @Column(name = "minimum_quantity", nullable = true)
     private Integer minimumQuantity;
 
-    @NotNull(message = "Unit price is required")
     @Positive(message = "Unit price must be positive")
-    @Column(name = "unit_price", nullable = false)
+    @Column(name = "unit_price", nullable = true)
     private Double unitPrice;
 
     @Column(name = "last_restocked")
@@ -54,8 +52,14 @@ public class InventoryItem {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        if (description == null) {
+            description = "No description available";
+        }
         if (minimumQuantity == null) {
             minimumQuantity = 10; // Default minimum quantity
+        }
+        if (unitPrice == null) {
+            unitPrice = 0.0; // Default unit price
         }
     }
 

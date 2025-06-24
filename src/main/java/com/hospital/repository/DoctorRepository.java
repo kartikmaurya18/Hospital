@@ -12,7 +12,7 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
 
     List<Doctor> findByIsAvailable(boolean isAvailable);
 
-    List<Doctor> findByActive(boolean isActive);
+    List<Doctor> findByIsActive(boolean isActive);
 
     Optional<Doctor> findByEmail(String email);
 }

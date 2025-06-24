@@ -11,6 +11,12 @@ public class Patient {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "is_active")
+    private boolean isActive = true;
+
+    @ManyToOne
+    @JoinColumn(name = "assigned_doctor_id")
+    private Doctor assignedDoctor;
     @Column(nullable = false)
     private String name;
 
@@ -94,5 +100,21 @@ public class Patient {
 
     public void setMedicalHistory(String medicalHistory) {
         this.medicalHistory = medicalHistory;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    public Doctor getAssignedDoctor() {
+        return assignedDoctor;
+    }
+
+    public void setAssignedDoctor(Doctor assignedDoctor) {
+        this.assignedDoctor = assignedDoctor;
     }
 }
